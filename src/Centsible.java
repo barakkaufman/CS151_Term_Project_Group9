@@ -11,7 +11,7 @@ import java.time.LocalDate;
 public class Centsible extends Application {
 
     private Stage primaryStage;
-    private DatabaseHelper dbHelper; // Assuming you have a DatabaseHelper class
+    private DatabaseHelper dbHelper;
     private TextField accountNameField;
     private DatePicker openingDatePicker;
     private TextField openingBalanceField;
@@ -30,16 +30,20 @@ public class Centsible extends Application {
         VBox homeLayout = new VBox(10);
         homeLayout.setPadding(new Insets(10));
 
+        Label homePageLabel = new Label("Home Page");
+        homePageLabel.setStyle("-fx-font-size: 24px; -fx-font-weight: bold;");
+
         accountListView = new ListView<>();
         refreshAccountList();
 
         Button createAccountButton = new Button("Create Account");
         createAccountButton.setOnAction(e -> primaryStage.setScene(createCreateAccountScene()));
 
-        homeLayout.getChildren().addAll(new Label("Your Accounts"), accountListView, createAccountButton);
+        homeLayout.getChildren().addAll(homePageLabel, new Label("Your Accounts"), accountListView, createAccountButton);
 
         return new Scene(homeLayout, 800, 640);
     }
+
 
     private Scene createCreateAccountScene() {
         GridPane createAccountPane = new GridPane();
@@ -54,6 +58,11 @@ public class Centsible extends Application {
         Button submitButton = new Button("Submit");
         submitButton.setOnAction(e -> createAccount());
 
+        // Add a "Back" button to return to the home page
+        Button backButton = new Button("Back");
+        backButton.setOnAction(e -> primaryStage.setScene(createHomeScene()));
+
+        // Add components to the grid
         createAccountPane.add(new Label("Account Name:"), 0, 0);
         createAccountPane.add(accountNameField, 1, 0);
         createAccountPane.add(new Label("Opening Date:"), 0, 1);
@@ -61,18 +70,28 @@ public class Centsible extends Application {
         createAccountPane.add(new Label("Opening Balance:"), 0, 2);
         createAccountPane.add(openingBalanceField, 1, 2);
         createAccountPane.add(submitButton, 1, 3);
+        createAccountPane.add(backButton, 0, 3); // Add the "Back" button to the same row as the "Submit" button
 
         return new Scene(createAccountPane, 800, 640);
     }
 
+
     private void createAccount() {
         String accountName = accountNameField.getText();
         LocalDate openingDate = openingDatePicker.getValue();
+        String openingBalanceText = openingBalanceField.getText();
+
+        // Check if any field is blank
+        if (accountName.isEmpty() || openingDate == null || openingBalanceText.isEmpty()) {
+            showAlert("Error", "Please fill in all fields.");
+            return;
+        }
+
         double openingBalance;
 
         // Validate the opening balance input
         try {
-            openingBalance = Double.parseDouble(openingBalanceField.getText());
+            openingBalance = Double.parseDouble(openingBalanceText);
         } catch (NumberFormatException e) {
             showAlert("Error", "Please enter a valid opening balance.");
             return;
@@ -92,6 +111,7 @@ public class Centsible extends Application {
             showAlert("Error", "Failed to create account.");
         }
     }
+
 
     private void refreshAccountList() {
         accountListView.getItems().clear();
