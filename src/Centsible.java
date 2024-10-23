@@ -2,6 +2,7 @@ import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 
@@ -15,7 +16,7 @@ public class Centsible extends Application {
     private TextField accountNameField;
     private DatePicker openingDatePicker;
     private TextField openingBalanceField;
-    private ListView<String> accountListView;
+    private TableView<Account> accountTable; // Use TableView for tabular display
 
     @Override
     public void start(Stage primaryStage) {
@@ -33,17 +34,31 @@ public class Centsible extends Application {
         Label homePageLabel = new Label("Home Page");
         homePageLabel.setStyle("-fx-font-size: 24px; -fx-font-weight: bold;");
 
-        accountListView = new ListView<>();
-        refreshAccountList();
+        accountTable = new TableView<>(); // Initialize the TableView
+        setupAccountTable();
+
+        refreshAccountTable(); // Populate the table with account details
 
         Button createAccountButton = new Button("Create Account");
         createAccountButton.setOnAction(e -> primaryStage.setScene(createCreateAccountScene()));
 
-        homeLayout.getChildren().addAll(homePageLabel, new Label("Your Accounts"), accountListView, createAccountButton);
+        homeLayout.getChildren().addAll(homePageLabel, new Label("Your Accounts"), accountTable, createAccountButton);
 
         return new Scene(homeLayout, 800, 640);
     }
 
+    private void setupAccountTable() {
+        TableColumn<Account, String> nameColumn = new TableColumn<>("Account Name");
+        nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
+
+        TableColumn<Account, Date> dateColumn = new TableColumn<>("Opening Date");
+        dateColumn.setCellValueFactory(new PropertyValueFactory<>("openingDate"));
+
+        TableColumn<Account, Double> balanceColumn = new TableColumn<>("Opening Balance");
+        balanceColumn.setCellValueFactory(new PropertyValueFactory<>("openingBalance"));
+
+        accountTable.getColumns().addAll(nameColumn, dateColumn, balanceColumn);
+    }
 
     private Scene createCreateAccountScene() {
         GridPane createAccountPane = new GridPane();
@@ -74,7 +89,6 @@ public class Centsible extends Application {
 
         return new Scene(createAccountPane, 800, 640);
     }
-
 
     private void createAccount() {
         String accountName = accountNameField.getText();
@@ -112,12 +126,11 @@ public class Centsible extends Application {
         }
     }
 
-
-    private void refreshAccountList() {
-        accountListView.getItems().clear();
-        // Get account details with balances from the database
-        for (String accountDetail : dbHelper.getAllAccountDetails()) {
-            accountListView.getItems().add(accountDetail);
+    private void refreshAccountTable() {
+        accountTable.getItems().clear();
+        // Get account details from the database
+        for (Account accountDetail : dbHelper.getAllAccountDetails()) {
+            accountTable.getItems().add(accountDetail);
         }
     }
 
@@ -133,3 +146,4 @@ public class Centsible extends Application {
         launch(args);
     }
 }
+

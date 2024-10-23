@@ -46,16 +46,19 @@ public class DatabaseHelper {
         }
     }
 
-    public List<String> getAllAccountDetails() {
-        List<String> accountDetails = new ArrayList<>();
-        String sql = "SELECT name, opening_balance FROM accounts";
+    public List<Account> getAllAccountDetails() {
+        List<Account> accountDetails = new ArrayList<>();
+        String sql = "SELECT name, opening_date, opening_balance FROM accounts ORDER BY opening_date DESC";
 
         try (Statement stmt = connection.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
             while (rs.next()) {
                 String name = rs.getString("name");
+                // Retrieve the opening_date as a long (timestamp)
+                long timestamp = rs.getLong("opening_date");
+                java.sql.Date date = new java.sql.Date(timestamp); // Convert to java.sql.Date
                 double balance = rs.getDouble("opening_balance");
-                accountDetails.add(name + " - $" + balance); // Format the display
+                accountDetails.add(new Account(name, date, balance)); // Format the display
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -78,3 +81,4 @@ public class DatabaseHelper {
     }
 
 }
+
