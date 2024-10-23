@@ -1,3 +1,5 @@
+package application;
+
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -53,8 +55,7 @@ public class DatabaseHelper {
         try (Statement stmt = connection.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
             while (rs.next()) {
-                String name = rs.getString("name");
-                // Retrieve the opening_date as a long (timestamp)
+                String name = rs.getString("name");// Retrieve the opening_date as a long (timestamp)
                 long timestamp = rs.getLong("opening_date");
                 java.sql.Date date = new java.sql.Date(timestamp); // Convert to java.sql.Date
                 double balance = rs.getDouble("opening_balance");

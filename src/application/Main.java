@@ -1,3 +1,5 @@
+package application;
+
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
@@ -9,7 +11,7 @@ import javafx.stage.Stage;
 import java.sql.Date;
 import java.time.LocalDate;
 
-public class Centsible extends Application {
+public class Main extends Application {
 
     private Stage primaryStage;
     private DatabaseHelper dbHelper;
@@ -22,7 +24,7 @@ public class Centsible extends Application {
     public void start(Stage primaryStage) {
         this.primaryStage = primaryStage;
         dbHelper = new DatabaseHelper(); // Initialize your database helper
-        primaryStage.setTitle("Centsible Banking App");
+        primaryStage.setTitle("application.Centsible Banking App");
         primaryStage.setScene(createHomeScene());
         primaryStage.show();
     }
@@ -39,7 +41,7 @@ public class Centsible extends Application {
 
         refreshAccountTable(); // Populate the table with account details
 
-        Button createAccountButton = new Button("Create Account");
+        Button createAccountButton = new Button("Create application.Account");
         createAccountButton.setOnAction(e -> primaryStage.setScene(createCreateAccountScene()));
 
         homeLayout.getChildren().addAll(homePageLabel, new Label("Your Accounts"), accountTable, createAccountButton);
@@ -48,7 +50,7 @@ public class Centsible extends Application {
     }
 
     private void setupAccountTable() {
-        TableColumn<Account, String> nameColumn = new TableColumn<>("Account Name");
+        TableColumn<Account, String> nameColumn = new TableColumn<>("application.Account Name");
         nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
 
         TableColumn<Account, Date> dateColumn = new TableColumn<>("Opening Date");
@@ -78,7 +80,7 @@ public class Centsible extends Application {
         backButton.setOnAction(e -> primaryStage.setScene(createHomeScene()));
 
         // Add components to the grid
-        createAccountPane.add(new Label("Account Name:"), 0, 0);
+        createAccountPane.add(new Label("application.Account Name:"), 0, 0);
         createAccountPane.add(accountNameField, 1, 0);
         createAccountPane.add(new Label("Opening Date:"), 0, 1);
         createAccountPane.add(openingDatePicker, 1, 1);
@@ -113,13 +115,13 @@ public class Centsible extends Application {
 
         // Check if the account name already exists
         if (dbHelper.accountExists(accountName)) {
-            showAlert("Error", "Account name already exists. Please choose a different name.");
+            showAlert("Error", "application.Account name already exists. Please choose a different name.");
             return;
         }
 
         // Create the account if the name does not exist
         if (dbHelper.createAccount(accountName, Date.valueOf(openingDate), openingBalance)) {
-            showAlert("Success", "Account created successfully!");
+            showAlert("Success", "application.Account created successfully!");
             primaryStage.setScene(createHomeScene());
         } else {
             showAlert("Error", "Failed to create account.");
