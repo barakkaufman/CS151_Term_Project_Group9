@@ -69,7 +69,7 @@ public class Main extends Application {
         createAccountPane.setVgap(10);
 
         accountNameField = new TextField();
-        openingDatePicker = new DatePicker();
+        openingDatePicker = new DatePicker(LocalDate.now());
         openingBalanceField = new TextField();
 
         Button submitButton = new Button("Submit");
