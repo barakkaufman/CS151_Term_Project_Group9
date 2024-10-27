@@ -24,7 +24,7 @@ public class Main extends Application {
     public void start(Stage primaryStage) {
         this.primaryStage = primaryStage;
         dbHelper = new DatabaseHelper(); // Initialize your database helper
-        primaryStage.setTitle("application.Centsible Banking App");
+        primaryStage.setTitle("Centsible Banking App");
         primaryStage.setScene(createHomeScene());
         primaryStage.show();
     }
@@ -41,7 +41,7 @@ public class Main extends Application {
 
         refreshAccountTable(); // Populate the table with account details
 
-        Button createAccountButton = new Button("Create application.Account");
+        Button createAccountButton = new Button("Create Account");
         createAccountButton.setOnAction(e -> primaryStage.setScene(createCreateAccountScene()));
 
         homeLayout.getChildren().addAll(homePageLabel, new Label("Your Accounts"), accountTable, createAccountButton);
@@ -50,7 +50,7 @@ public class Main extends Application {
     }
 
     private void setupAccountTable() {
-        TableColumn<Account, String> nameColumn = new TableColumn<>("application.Account Name");
+        TableColumn<Account, String> nameColumn = new TableColumn<>("Account Name");
         nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
 
         TableColumn<Account, Date> dateColumn = new TableColumn<>("Opening Date");
@@ -80,7 +80,7 @@ public class Main extends Application {
         backButton.setOnAction(e -> primaryStage.setScene(createHomeScene()));
 
         // Add components to the grid
-        createAccountPane.add(new Label("application.Account Name:"), 0, 0);
+        createAccountPane.add(new Label("Account Name:"), 0, 0);
         createAccountPane.add(accountNameField, 1, 0);
         createAccountPane.add(new Label("Opening Date:"), 0, 1);
         createAccountPane.add(openingDatePicker, 1, 1);
@@ -115,13 +115,13 @@ public class Main extends Application {
 
         // Check if the account name already exists
         if (dbHelper.accountExists(accountName)) {
-            showAlert("Error", "application.Account name already exists. Please choose a different name.");
+            showAlert("Error", "Account name already exists. Please choose a different name.");
             return;
         }
 
         // Create the account if the name does not exist
         if (dbHelper.createAccount(accountName, Date.valueOf(openingDate), openingBalance)) {
-            showAlert("Success", "application.Account created successfully!");
+            showAlert("Success", "Account created successfully!");
             primaryStage.setScene(createHomeScene());
         } else {
             showAlert("Error", "Failed to create account.");
