@@ -11,6 +11,7 @@ import javafx.stage.Stage;
 import java.sql.Date;
 import java.time.LocalDate;
 
+
 public class Main extends Application {
 
     private Stage primaryStage;
@@ -19,6 +20,15 @@ public class Main extends Application {
     private DatePicker openingDatePicker;
     private TextField openingBalanceField;
     private TableView<Account> accountTable; // Use TableView for tabular display
+
+    // Adnan added-modified-start transaction fields
+    private ComboBox<String> accountComboBox;
+    private ComboBox<String> transactionTypeComboBox;
+    private DatePicker transactionDatePicker;
+    private TextField transactionDescriptionField;
+    private TextField paymentAmountField;
+    private TextField depositAmountField;
+    // Adnan added-modified-end
 
     @Override
     public void start(Stage primaryStage) {
@@ -44,7 +54,15 @@ public class Main extends Application {
         Button createAccountButton = new Button("Create Account");
         createAccountButton.setOnAction(e -> primaryStage.setScene(createCreateAccountScene()));
 
-        homeLayout.getChildren().addAll(homePageLabel, new Label("Your Accounts"), accountTable, createAccountButton);
+        // Adnan added-modified-start
+
+
+        Button enterTransactionsButton = new Button("Create New Transaction");
+        enterTransactionsButton.setOnAction(e -> primaryStage.setScene(createEnterTransactionsScene()));
+
+        homeLayout.getChildren().addAll(homePageLabel, new Label("Your Accounts"),
+                accountTable, createAccountButton, enterTransactionsButton);
+        // Adnan added-modified-end
 
         return new Scene(homeLayout, 800, 640);
     }
@@ -143,6 +161,101 @@ public class Main extends Application {
         alert.setContentText(message);
         alert.showAndWait();
     }
+
+    // Adnan added-modified-start
+    private Scene createEnterTransactionsScene() {
+        GridPane enterTransactionPane = new GridPane();
+        enterTransactionPane.setPadding(new Insets(10));
+        enterTransactionPane.setHgap(10);
+        enterTransactionPane.setVgap(10);
+
+        // Initialize components
+        accountComboBox = new ComboBox<>();
+        accountComboBox.getItems().addAll(dbHelper.getAllAccountNames());
+        if (!accountComboBox.getItems().isEmpty()) {
+            accountComboBox.setValue(accountComboBox.getItems().get(0));
+        }
+
+        transactionTypeComboBox = new ComboBox<>();
+        transactionTypeComboBox.getItems().addAll("Expense", "Income"); // temporary transaction types
+        transactionTypeComboBox.setValue(transactionTypeComboBox.getItems().get(0));
+
+        transactionDatePicker = new DatePicker(LocalDate.now());
+        transactionDescriptionField = new TextField();
+        paymentAmountField = new TextField();
+        depositAmountField = new TextField();
+
+        Button submitButton = new Button("Submit");
+        submitButton.setOnAction(e -> saveTransaction());
+
+        Button backButton = new Button("Back");
+        backButton.setOnAction(e -> primaryStage.setScene(createHomeScene()));
+
+        // Add components to the grid
+        enterTransactionPane.add(new Label("Account:"), 0, 0);
+        enterTransactionPane.add(accountComboBox, 1, 0);
+        enterTransactionPane.add(new Label("Transaction Type:"), 0, 1);
+        enterTransactionPane.add(transactionTypeComboBox, 1, 1);
+        enterTransactionPane.add(new Label("Transaction Date:"), 0, 2);
+        enterTransactionPane.add(transactionDatePicker, 1, 2);
+        enterTransactionPane.add(new Label("Transaction Description:"), 0, 3);
+        enterTransactionPane.add(transactionDescriptionField, 1, 3);
+        enterTransactionPane.add(new Label("Payment Amount:"), 0, 4);
+        enterTransactionPane.add(paymentAmountField, 1, 4);
+        enterTransactionPane.add(new Label("Deposit Amount:"), 0, 5);
+        enterTransactionPane.add(depositAmountField, 1, 5);
+        enterTransactionPane.add(submitButton, 1, 6);
+        enterTransactionPane.add(backButton, 0, 6);
+
+        return new Scene(enterTransactionPane, 800, 640);
+    }
+
+    private void saveTransaction() {
+        String accountName = accountComboBox.getValue();
+        String transactionType = transactionTypeComboBox.getValue();
+        LocalDate transactionDate = transactionDatePicker.getValue();
+        String transactionDescription = transactionDescriptionField.getText();
+        String paymentAmountText = paymentAmountField.getText();
+        String depositAmountText = depositAmountField.getText();
+
+        // Validate required fields
+        if (accountName == null || transactionType == null ||
+                transactionDate == null || transactionDescription.isEmpty()) {
+            showAlert("Error", "Please fill in all required fields.");
+            return;
+        }
+
+        // Validate amounts
+        if (paymentAmountText.isEmpty() && depositAmountText.isEmpty()) {
+            showAlert("Error", "Please enter either a payment or deposit amount.");
+            return;
+        }
+
+        double paymentAmount = 0;
+        double depositAmount = 0;
+
+        try {
+            if (!paymentAmountText.isEmpty()) {
+                paymentAmount = Double.parseDouble(paymentAmountText);
+            }
+            if (!depositAmountText.isEmpty()) {
+                depositAmount = Double.parseDouble(depositAmountText);
+            }
+        } catch (NumberFormatException e) {
+            showAlert("Error", "Please enter valid numbers for amounts.");
+            return;
+        }
+
+        // Save transaction to database
+        if (dbHelper.saveTransaction(accountName, transactionType, Date.valueOf(transactionDate),
+                transactionDescription, paymentAmount, depositAmount)) {
+            showAlert("Success", "Transaction saved successfully!");
+            primaryStage.setScene(createHomeScene());
+        } else {
+            showAlert("Error", "Failed to save transaction.");
+        }
+    }
+    // Adnan added-modified-end
 
     public static void main(String[] args) {
         launch(args);
