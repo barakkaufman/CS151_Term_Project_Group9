@@ -18,6 +18,7 @@ public class Main extends Application {
     private TextField accountNameField;
     private DatePicker openingDatePicker;
     private TextField openingBalanceField;
+    private TextField transactionTypeField;
     private TableView<Account> accountTable; // Use TableView for tabular display
 
     @Override
@@ -44,7 +45,11 @@ public class Main extends Application {
         Button createAccountButton = new Button("Create Account");
         createAccountButton.setOnAction(e -> primaryStage.setScene(createCreateAccountScene()));
 
-        homeLayout.getChildren().addAll(homePageLabel, new Label("Your Accounts"), accountTable, createAccountButton);
+        Button createTransactionTypeButton = new Button("Create Transaction Type");
+        createTransactionTypeButton.setOnAction(e -> primaryStage.setScene(createTransactionTypeScene()));
+
+
+        homeLayout.getChildren().addAll(homePageLabel, new Label("Your Accounts"), accountTable, createAccountButton, createTransactionTypeButton);
 
         return new Scene(homeLayout, 800, 640);
     }
@@ -125,6 +130,43 @@ public class Main extends Application {
             primaryStage.setScene(createHomeScene());
         } else {
             showAlert("Error", "Failed to create account.");
+        }
+    }
+
+    private Scene createTransactionTypeScene() {
+        VBox layout = new VBox(10);
+        layout.setPadding(new Insets(10));
+
+        Label titleLabel = new Label("Create Transaction Type");
+        titleLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
+
+        transactionTypeField = new TextField();
+        transactionTypeField.setPromptText("Enter transaction type name");
+
+        Button saveButton = new Button("Save");
+        saveButton.setOnAction(e -> saveTransactionType());
+
+        Button backButton = new Button("Back");
+        backButton.setOnAction(e -> primaryStage.setScene(createHomeScene()));
+
+        layout.getChildren().addAll(titleLabel, new Label("Transaction Type Name:"), transactionTypeField, saveButton, backButton);
+
+        return new Scene(layout, 400, 300);
+    }
+
+    private void saveTransactionType() {
+        String transactionTypeName = transactionTypeField.getText().trim();
+
+        if (transactionTypeName.isEmpty()) {
+            showAlert("Error", "Transaction type name cannot be empty.");
+            return;
+        }
+
+        if (dbHelper.createTransactionType(transactionTypeName)) {
+            showAlert("Success", "Transaction type created successfully!");
+            primaryStage.setScene(createHomeScene());
+        } else {
+            showAlert("Error", "Transaction type already exists or could not be created.");
         }
     }
 

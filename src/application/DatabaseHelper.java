@@ -13,6 +13,7 @@ public class DatabaseHelper {
             // Adjust the URL to your SQLite database location
             connection = DriverManager.getConnection("jdbc:sqlite:mydatabase.db");
             createAccountTable();
+            createTransactionTypeTable();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -79,6 +80,48 @@ public class DatabaseHelper {
             e.printStackTrace();
         }
         return false;
+    }
+
+    private void createTransactionTypeTable() {
+        String sql = "CREATE TABLE IF NOT EXISTS transactionTypes (" +
+                "id INTEGER PRIMARY KEY AUTOINCREMENT," +
+                "name TEXT NOT NULL UNIQUE" + // Ensure unique transaction names
+                ");";
+
+        try (Statement stmt = connection.createStatement()) {
+            stmt.execute(sql);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public boolean createTransactionType(String name) {
+        String sql = "INSERT INTO transactionTypes (name) VALUES (?)";
+
+        if (transactionTypeExists(name)) {
+            return false; // Prevent duplicates
+        }
+
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setString(1, name);
+            pstmt.executeUpdate();
+            return true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    private boolean transactionTypeExists(String name) {
+        String sql = "SELECT COUNT(*) FROM transactionTypes WHERE name = ?";
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setString(1, name);
+            ResultSet rs = pstmt.executeQuery();
+            return rs.getInt(1) > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
 }
