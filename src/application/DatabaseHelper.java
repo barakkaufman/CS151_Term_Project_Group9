@@ -13,10 +13,61 @@ public class DatabaseHelper {
             // Adjust the URL to your SQLite database location
             connection = DriverManager.getConnection("jdbc:sqlite:mydatabase.db");
             createAccountTable();
-            createTransactionTypeTable();
+            createTransactionTable();
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    private void createTransactionTable() {
+        String sql = "CREATE TABLE IF NOT EXISTS transactions (" +
+                "id INTEGER PRIMARY KEY AUTOINCREMENT," +
+                "account_name TEXT NOT NULL," +
+                "transaction_type TEXT NOT NULL," +
+                "transaction_date DATE NOT NULL," +
+                "description TEXT," +
+                "payment_amount REAL," +
+                "deposit_amount REAL," +
+                "FOREIGN KEY (account_name) REFERENCES accounts(name)" +
+                ");";
+        try (Statement stmt = connection.createStatement()) {
+            stmt.execute(sql);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public boolean saveTransaction(String accountName, String transactionType, Date transactionDate,
+                                   String description, double paymentAmount, double depositAmount) {
+        String sql = "INSERT INTO transactions (account_name, transaction_type, transaction_date, " +
+                "description, payment_amount, deposit_amount) VALUES (?, ?, ?, ?, ?, ?)";
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setString(1, accountName);
+            pstmt.setString(2, transactionType);
+            pstmt.setDate(3, transactionDate);
+            pstmt.setString(4, description);
+            pstmt.setDouble(5, paymentAmount);
+            pstmt.setDouble(6, depositAmount);
+            pstmt.executeUpdate();
+            return true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public List<String> getAllAccountNames() {
+        List<String> accountNames = new ArrayList<>();
+        String sql = "SELECT name FROM accounts";
+        try (Statement stmt = connection.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+            while (rs.next()) {
+                accountNames.add(rs.getString("name"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return accountNames;
     }
 
     private void createAccountTable() {
@@ -82,47 +133,4 @@ public class DatabaseHelper {
         return false;
     }
 
-    private void createTransactionTypeTable() {
-        String sql = "CREATE TABLE IF NOT EXISTS transactionTypes (" +
-                "id INTEGER PRIMARY KEY AUTOINCREMENT," +
-                "name TEXT NOT NULL UNIQUE" + // Ensure unique transaction names
-                ");";
-
-        try (Statement stmt = connection.createStatement()) {
-            stmt.execute(sql);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public boolean createTransactionType(String name) {
-        String sql = "INSERT INTO transactionTypes (name) VALUES (?)";
-
-        if (transactionTypeExists(name)) {
-            return false; // Prevent duplicates
-        }
-
-        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setString(1, name);
-            pstmt.executeUpdate();
-            return true;
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-
-    private boolean transactionTypeExists(String name) {
-        String sql = "SELECT COUNT(*) FROM transactionTypes WHERE name = ?";
-        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setString(1, name);
-            ResultSet rs = pstmt.executeQuery();
-            return rs.getInt(1) > 0;
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-
 }
-
