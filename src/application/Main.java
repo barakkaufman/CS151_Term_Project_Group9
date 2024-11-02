@@ -21,14 +21,12 @@ public class Main extends Application {
     private TextField openingBalanceField;
     private TableView<Account> accountTable; // Use TableView for tabular display
 
-    // Adnan added-modified-start transaction fields
     private ComboBox<String> accountComboBox;
     private ComboBox<String> transactionTypeComboBox;
     private DatePicker transactionDatePicker;
     private TextField transactionDescriptionField;
     private TextField paymentAmountField;
     private TextField depositAmountField;
-    // Adnan added-modified-end
 
     @Override
     public void start(Stage primaryStage) {
@@ -54,7 +52,6 @@ public class Main extends Application {
         Button createAccountButton = new Button("Create Account");
         createAccountButton.setOnAction(e -> primaryStage.setScene(createCreateAccountScene()));
 
-        // Adnan added-modified-start
 
 
         Button enterTransactionsButton = new Button("Create New Transaction");
@@ -62,7 +59,6 @@ public class Main extends Application {
 
         homeLayout.getChildren().addAll(homePageLabel, new Label("Your Accounts"),
                 accountTable, createAccountButton, enterTransactionsButton);
-        // Adnan added-modified-end
 
         return new Scene(homeLayout, 800, 640);
     }
@@ -162,14 +158,45 @@ public class Main extends Application {
         alert.showAndWait();
     }
 
-    // Adnan added-modified-start
+    private Scene createAddTransactionTypeScene() {
+        VBox layout = new VBox(10);
+        layout.setPadding(new Insets(10));
+
+        Label label = new Label("Add New Transaction Type");
+        TextField transactionTypeField = new TextField();
+        transactionTypeField.setPromptText("Enter transaction type name");
+
+        Button saveButton = new Button("Save");
+        saveButton.setOnAction(e -> {
+            String typeName = transactionTypeField.getText().trim();
+            if (typeName.isEmpty()) {
+                showAlert("Error", "Transaction type name cannot be empty.");
+                return;
+            }
+            if (dbHelper.addTransactionType(typeName)) {
+                showAlert("Success", "Transaction type added successfully.");
+                transactionTypeComboBox.getItems().clear();
+                transactionTypeComboBox.getItems().addAll(dbHelper.getAllTransactionTypes());
+                primaryStage.setScene(createEnterTransactionsScene());
+            } else {
+                showAlert("Error", "Transaction type already exists or could not be saved.");
+            }
+        });
+
+        Button backButton = new Button("Back");
+        backButton.setOnAction(e -> primaryStage.setScene(createEnterTransactionsScene()));
+
+        layout.getChildren().addAll(label, transactionTypeField, saveButton, backButton);
+        return new Scene(layout, 400, 200);
+    }
+
+
     private Scene createEnterTransactionsScene() {
         GridPane enterTransactionPane = new GridPane();
         enterTransactionPane.setPadding(new Insets(10));
         enterTransactionPane.setHgap(10);
         enterTransactionPane.setVgap(10);
 
-        // Initialize components
         accountComboBox = new ComboBox<>();
         accountComboBox.getItems().addAll(dbHelper.getAllAccountNames());
         if (!accountComboBox.getItems().isEmpty()) {
@@ -177,8 +204,11 @@ public class Main extends Application {
         }
 
         transactionTypeComboBox = new ComboBox<>();
-        transactionTypeComboBox.getItems().addAll("Expense", "Income"); // temporary transaction types
-        transactionTypeComboBox.setValue(transactionTypeComboBox.getItems().get(0));
+        transactionTypeComboBox.getItems().addAll(dbHelper.getAllTransactionTypes());
+        transactionTypeComboBox.setValue(transactionTypeComboBox.getItems().isEmpty() ? null : transactionTypeComboBox.getItems().get(0));
+
+        Button addTransactionTypeButton = new Button("Add Type");
+        addTransactionTypeButton.setOnAction(e -> primaryStage.setScene(createAddTransactionTypeScene()));
 
         transactionDatePicker = new DatePicker(LocalDate.now());
         transactionDescriptionField = new TextField();
@@ -191,11 +221,11 @@ public class Main extends Application {
         Button backButton = new Button("Back");
         backButton.setOnAction(e -> primaryStage.setScene(createHomeScene()));
 
-        // Add components to the grid
         enterTransactionPane.add(new Label("Account:"), 0, 0);
         enterTransactionPane.add(accountComboBox, 1, 0);
         enterTransactionPane.add(new Label("Transaction Type:"), 0, 1);
         enterTransactionPane.add(transactionTypeComboBox, 1, 1);
+        enterTransactionPane.add(addTransactionTypeButton, 2, 1);
         enterTransactionPane.add(new Label("Transaction Date:"), 0, 2);
         enterTransactionPane.add(transactionDatePicker, 1, 2);
         enterTransactionPane.add(new Label("Transaction Description:"), 0, 3);
@@ -209,6 +239,7 @@ public class Main extends Application {
 
         return new Scene(enterTransactionPane, 800, 640);
     }
+
 
     private void saveTransaction() {
         String accountName = accountComboBox.getValue();
@@ -255,7 +286,6 @@ public class Main extends Application {
             showAlert("Error", "Failed to save transaction.");
         }
     }
-    // Adnan added-modified-end
 
     public static void main(String[] args) {
         launch(args);
