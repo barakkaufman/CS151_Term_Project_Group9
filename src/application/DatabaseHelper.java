@@ -175,6 +175,7 @@ public class DatabaseHelper {
         return accountDetails;
     }
 
+
     public boolean accountExists(String accountName) {
         String sql = "SELECT COUNT(*) FROM accounts WHERE name = ?";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {

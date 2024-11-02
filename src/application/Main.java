@@ -54,15 +54,16 @@ public class Main extends Application {
         Button createAccountButton = new Button("Create Account");
         createAccountButton.setOnAction(e -> primaryStage.setScene(createCreateAccountScene()));
 
+        Button addTransactionTypeButton = new Button("Add Transaction Type");
+        addTransactionTypeButton.setOnAction(e -> primaryStage.setScene(createAddTransactionTypeScene()));
+
         // Adnan added-modified-start
-
-
         Button enterTransactionsButton = new Button("Create New Transaction");
         enterTransactionsButton.setOnAction(e -> primaryStage.setScene(createEnterTransactionsScene()));
+        // Adnan added-modified-end
 
         homeLayout.getChildren().addAll(homePageLabel, new Label("Your Accounts"),
-                accountTable, createAccountButton, enterTransactionsButton);
-        // Adnan added-modified-end
+                accountTable, createAccountButton, addTransactionTypeButton, enterTransactionsButton);
 
         return new Scene(homeLayout, 800, 640);
     }
@@ -194,7 +195,7 @@ public class Main extends Application {
         });
 
         Button backButton = new Button("Back");
-        backButton.setOnAction(e -> primaryStage.setScene(createEnterTransactionsScene()));
+        backButton.setOnAction(e -> primaryStage.setScene(createHomeScene()));
 
         addTransactionTypePane.add(new Label("Transaction Type Name:"), 0, 0);
         addTransactionTypePane.add(transactionTypeNameField, 1, 0);
@@ -222,9 +223,6 @@ public class Main extends Application {
         transactionTypeComboBox.getItems().addAll(dbHelper.getAllTransactionTypes());
         transactionTypeComboBox.setValue(transactionTypeComboBox.getItems().isEmpty() ? null : transactionTypeComboBox.getItems().get(0));
 
-        Button addTransactionTypeButton = new Button("Add Type");
-        addTransactionTypeButton.setOnAction(e -> primaryStage.setScene(createAddTransactionTypeScene()));
-
         transactionDatePicker = new DatePicker(LocalDate.now());
         transactionDescriptionField = new TextField();
         paymentAmountField = new TextField();
@@ -240,7 +238,6 @@ public class Main extends Application {
         enterTransactionPane.add(accountComboBox, 1, 0);
         enterTransactionPane.add(new Label("Transaction Type:"), 0, 1);
         enterTransactionPane.add(transactionTypeComboBox, 1, 1);
-        enterTransactionPane.add(addTransactionTypeButton, 2, 1);
         enterTransactionPane.add(new Label("Transaction Date:"), 0, 2);
         enterTransactionPane.add(transactionDatePicker, 1, 2);
         enterTransactionPane.add(new Label("Transaction Description:"), 0, 3);
