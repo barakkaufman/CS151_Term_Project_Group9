@@ -14,10 +14,66 @@ public class DatabaseHelper {
             connection = DriverManager.getConnection("jdbc:sqlite:mydatabase.db");
             createAccountTable();
             createTransactionTable();
+            createTransactionTypeTable();
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
+
+    private void createTransactionTypeTable() {
+        String sql = "CREATE TABLE IF NOT EXISTS transaction_types (" +
+                "id INTEGER PRIMARY KEY AUTOINCREMENT," +
+                "name TEXT NOT NULL UNIQUE" +
+                ");";
+        try (Statement stmt = connection.createStatement()) {
+            stmt.execute(sql);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public boolean addTransactionType(String typeName) {
+        String sql = "INSERT INTO transaction_types (name) VALUES (?)";
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setString(1, typeName);
+            pstmt.executeUpdate();
+            return true;
+        } catch (SQLException e) {
+            if (e.getMessage().contains("UNIQUE constraint failed")) {
+                System.out.println("Transaction type already exists.");
+            }
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public boolean transactionTypeExists(String transactionType) {
+        String sql = "SELECT COUNT(*) FROM transaction_types WHERE name = ?";
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setString(1, transactionType);
+            ResultSet rs = pstmt.executeQuery();
+            return rs.next() && rs.getInt(1) > 0; // Return true if count is greater than 0
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+
+    public List<String> getAllTransactionTypes() {
+        List<String> transactionTypes = new ArrayList<>();
+        String sql = "SELECT name FROM transaction_types";
+        try (Statement stmt = connection.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+            while (rs.next()) {
+                transactionTypes.add(rs.getString("name"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return transactionTypes;
+    }
+
 
     private void createTransactionTable() {
         String sql = "CREATE TABLE IF NOT EXISTS transactions (" +

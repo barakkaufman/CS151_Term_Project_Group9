@@ -162,6 +162,49 @@ public class Main extends Application {
         alert.showAndWait();
     }
 
+    private Scene createAddTransactionTypeScene() {
+        GridPane addTransactionTypePane = new GridPane();
+        addTransactionTypePane.setPadding(new Insets(10));
+        addTransactionTypePane.setHgap(10);
+        addTransactionTypePane.setVgap(10);
+
+        TextField transactionTypeNameField = new TextField();
+
+        Button submitButton = new Button("Submit");
+        submitButton.setOnAction(e -> {
+            String transactionTypeName = transactionTypeNameField.getText().trim();
+
+            if (transactionTypeName.isEmpty()) {
+                showAlert("Error", "Transaction type name cannot be empty.");
+                return;
+            }
+
+            if (dbHelper.transactionTypeExists(transactionTypeName)) {
+                showAlert("Error", "Transaction type already exists. Please enter a unique name.");
+                return;
+            }
+
+            if (dbHelper.addTransactionType(transactionTypeName)) {
+                showAlert("Success", "Transaction type added successfully!");
+                transactionTypeComboBox.getItems().add(transactionTypeName); // Update ComboBox
+                primaryStage.setScene(createEnterTransactionsScene());
+            } else {
+                showAlert("Error", "Failed to add transaction type.");
+            }
+        });
+
+        Button backButton = new Button("Back");
+        backButton.setOnAction(e -> primaryStage.setScene(createEnterTransactionsScene()));
+
+        addTransactionTypePane.add(new Label("Transaction Type Name:"), 0, 0);
+        addTransactionTypePane.add(transactionTypeNameField, 1, 0);
+        addTransactionTypePane.add(submitButton, 1, 1);
+        addTransactionTypePane.add(backButton, 0, 1);
+
+        return new Scene(addTransactionTypePane, 400, 200);
+    }
+
+
     // Adnan added-modified-start
     private Scene createEnterTransactionsScene() {
         GridPane enterTransactionPane = new GridPane();
@@ -169,7 +212,6 @@ public class Main extends Application {
         enterTransactionPane.setHgap(10);
         enterTransactionPane.setVgap(10);
 
-        // Initialize components
         accountComboBox = new ComboBox<>();
         accountComboBox.getItems().addAll(dbHelper.getAllAccountNames());
         if (!accountComboBox.getItems().isEmpty()) {
@@ -177,8 +219,11 @@ public class Main extends Application {
         }
 
         transactionTypeComboBox = new ComboBox<>();
-        transactionTypeComboBox.getItems().addAll("Expense", "Income"); // temporary transaction types
-        transactionTypeComboBox.setValue(transactionTypeComboBox.getItems().get(0));
+        transactionTypeComboBox.getItems().addAll(dbHelper.getAllTransactionTypes());
+        transactionTypeComboBox.setValue(transactionTypeComboBox.getItems().isEmpty() ? null : transactionTypeComboBox.getItems().get(0));
+
+        Button addTransactionTypeButton = new Button("Add Type");
+        addTransactionTypeButton.setOnAction(e -> primaryStage.setScene(createAddTransactionTypeScene()));
 
         transactionDatePicker = new DatePicker(LocalDate.now());
         transactionDescriptionField = new TextField();
@@ -191,11 +236,11 @@ public class Main extends Application {
         Button backButton = new Button("Back");
         backButton.setOnAction(e -> primaryStage.setScene(createHomeScene()));
 
-        // Add components to the grid
         enterTransactionPane.add(new Label("Account:"), 0, 0);
         enterTransactionPane.add(accountComboBox, 1, 0);
         enterTransactionPane.add(new Label("Transaction Type:"), 0, 1);
         enterTransactionPane.add(transactionTypeComboBox, 1, 1);
+        enterTransactionPane.add(addTransactionTypeButton, 2, 1);
         enterTransactionPane.add(new Label("Transaction Date:"), 0, 2);
         enterTransactionPane.add(transactionDatePicker, 1, 2);
         enterTransactionPane.add(new Label("Transaction Description:"), 0, 3);
@@ -209,6 +254,7 @@ public class Main extends Application {
 
         return new Scene(enterTransactionPane, 800, 640);
     }
+
 
     private void saveTransaction() {
         String accountName = accountComboBox.getValue();
