@@ -11,6 +11,8 @@ import javafx.stage.Stage;
 import java.sql.Date;
 import java.time.LocalDate;
 
+import javafx.geometry.Pos;
+
 
 public class Main extends Application {
 
@@ -43,6 +45,22 @@ public class Main extends Application {
         VBox homeLayout = new VBox(10);
         homeLayout.setPadding(new Insets(10));
 
+        MenuBar menuBar = new MenuBar();
+        Menu actionsMenu = new Menu("Pages");
+
+        // Create MenuItems
+        MenuItem viewTransactionsMenuItem = new MenuItem("View Transactions");
+//        viewTransactionsMenuItem.setOnAction(e -> primaryStage.setScene(createTransactionsScene()));
+
+        MenuItem viewScheduledTransactionsMenuItem = new MenuItem("View Scheduled Transactions");
+//        viewScheduledTransactionsMenuItem.setOnAction(e -> primaryStage.setScene(createScheduledTransactionsScene()));
+
+        // Add MenuItems to the Menu
+        actionsMenu.getItems().addAll(viewTransactionsMenuItem, viewScheduledTransactionsMenuItem);
+
+        // Add the Menu to the MenuBar
+        menuBar.getMenus().add(actionsMenu);
+
         Label homePageLabel = new Label("Home Page");
         homePageLabel.setStyle("-fx-font-size: 24px; -fx-font-weight: bold;");
 
@@ -62,8 +80,11 @@ public class Main extends Application {
         enterTransactionsButton.setOnAction(e -> primaryStage.setScene(createEnterTransactionsScene()));
         // Adnan added-modified-end
 
-        homeLayout.getChildren().addAll(homePageLabel, new Label("Your Accounts"),
-                accountTable, createAccountButton, addTransactionTypeButton, enterTransactionsButton);
+        Button enterScheduledTransactionsButton = new Button("Create New Scheduled Transaction");
+//        enterScheduledTransactionsButton.setOnAction(e -> primaryStage.setScene(createEnterScheduledTransactionsScene()));
+
+        homeLayout.getChildren().addAll(menuBar, homePageLabel, new Label("Your Accounts"),
+                accountTable, createAccountButton, addTransactionTypeButton, enterTransactionsButton, enterScheduledTransactionsButton);
 
         return new Scene(homeLayout, 800, 640);
     }
