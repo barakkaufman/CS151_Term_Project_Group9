@@ -2,6 +2,7 @@ package application;
 
 import javafx.application.Application;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -11,7 +12,6 @@ import javafx.stage.Stage;
 import java.sql.Date;
 import java.time.LocalDate;
 
-import javafx.geometry.Pos;
 
 
 public class Main extends Application {
@@ -21,7 +21,7 @@ public class Main extends Application {
     private TextField accountNameField;
     private DatePicker openingDatePicker;
     private TextField openingBalanceField;
-    private TableView<Account> accountTable; // Use TableView for tabular display
+    private TableView<Account> accountTable;
 
     // Adnan added-modified-start transaction fields
     private ComboBox<String> accountComboBox;
@@ -35,7 +35,7 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) {
         this.primaryStage = primaryStage;
-        dbHelper = new DatabaseHelper(); // Initialize your database helper
+        dbHelper = new DatabaseHelper();
         primaryStage.setTitle("Centsible Banking App");
         primaryStage.setScene(createHomeScene());
         primaryStage.show();
@@ -43,9 +43,11 @@ public class Main extends Application {
 
     private Scene createHomeScene() {
         VBox homeLayout = new VBox(10);
-        homeLayout.setPadding(new Insets(10));
+        homeLayout.setPadding(new Insets(20));
+        homeLayout.setStyle("-fx-background-color: white;");
 
         MenuBar menuBar = new MenuBar();
+        menuBar.setStyle("-fx-background-color: #749485;");
         Menu actionsMenu = new Menu("Pages");
 
         // Create MenuItems
@@ -62,29 +64,58 @@ public class Main extends Application {
         menuBar.getMenus().add(actionsMenu);
 
         Label homePageLabel = new Label("Home Page");
-        homePageLabel.setStyle("-fx-font-size: 24px; -fx-font-weight: bold;");
+        homePageLabel.setStyle("-fx-font-size: 24px; -fx-text-fill: #1e4b35 ; -fx-font-weight: bold;");
 
         accountTable = new TableView<>(); // Initialize the TableView
         setupAccountTable();
 
         refreshAccountTable(); // Populate the table with account details
 
+        // Define button styles
+        String buttonStyle = "-fx-background-color: #cbdfd6;";
+        String hoverStyle = "-fx-background-color: #749485; -fx-text-fill: white;";
+
         Button createAccountButton = new Button("Create Account");
+        createAccountButton.setStyle(buttonStyle);
         createAccountButton.setOnAction(e -> primaryStage.setScene(createCreateAccountScene()));
+        createAccountButton.setOnMouseEntered(e -> createAccountButton.setStyle(hoverStyle));
+        createAccountButton.setOnMouseExited(e -> createAccountButton.setStyle(buttonStyle));
 
         Button addTransactionTypeButton = new Button("Add Transaction Type");
         addTransactionTypeButton.setOnAction(e -> primaryStage.setScene(createAddTransactionTypeScene()));
+        addTransactionTypeButton.setStyle(buttonStyle);
+        addTransactionTypeButton.setOnMouseEntered(e -> addTransactionTypeButton.setStyle(hoverStyle));
+        addTransactionTypeButton.setOnMouseExited(e -> addTransactionTypeButton.setStyle(buttonStyle));
 
         // Adnan added-modified-start
         Button enterTransactionsButton = new Button("Create New Transaction");
         enterTransactionsButton.setOnAction(e -> primaryStage.setScene(createEnterTransactionsScene()));
+        enterTransactionsButton.setStyle(buttonStyle);
+        enterTransactionsButton.setOnMouseEntered(e -> enterTransactionsButton.setStyle(hoverStyle));
+        enterTransactionsButton.setOnMouseExited(e -> enterTransactionsButton.setStyle(buttonStyle));
         // Adnan added-modified-end
 
         Button enterScheduledTransactionsButton = new Button("Create New Scheduled Transaction");
 //        enterScheduledTransactionsButton.setOnAction(e -> primaryStage.setScene(createEnterScheduledTransactionsScene()));
+        enterScheduledTransactionsButton.setStyle(buttonStyle);
+        enterScheduledTransactionsButton.setOnMouseEntered(e -> enterScheduledTransactionsButton.setStyle(hoverStyle));
+        enterScheduledTransactionsButton.setOnMouseExited(e -> enterScheduledTransactionsButton.setStyle(buttonStyle));
+
+
+        // Place buttons in an HBox for horizontal layout
+        HBox buttonLayout = new HBox(15);
+        buttonLayout.setAlignment(Pos.CENTER);
+        buttonLayout.getChildren().addAll(createAccountButton, addTransactionTypeButton, enterTransactionsButton, enterScheduledTransactionsButton);
+
+        // Add a spacer to create space between the account table and buttons
+        Region spacer = new Region();
+        spacer.setMinHeight(20);
+
 
         homeLayout.getChildren().addAll(menuBar, homePageLabel, new Label("Your Accounts"),
-                accountTable, createAccountButton, addTransactionTypeButton, enterTransactionsButton, enterScheduledTransactionsButton);
+                accountTable, spacer, buttonLayout);
+
+        homeLayout.setAlignment(Pos.TOP_CENTER);
 
         return new Scene(homeLayout, 800, 640);
     }
@@ -95,29 +126,49 @@ public class Main extends Application {
 
         TableColumn<Account, Date> dateColumn = new TableColumn<>("Opening Date");
         dateColumn.setCellValueFactory(new PropertyValueFactory<>("openingDate"));
+        dateColumn.setStyle("-fx-text-fill: #749485;");
 
         TableColumn<Account, Double> balanceColumn = new TableColumn<>("Opening Balance");
         balanceColumn.setCellValueFactory(new PropertyValueFactory<>("openingBalance"));
+        balanceColumn.setStyle("-fx-text-fill: #749485;");
 
         accountTable.getColumns().addAll(nameColumn, dateColumn, balanceColumn);
     }
 
     private Scene createCreateAccountScene() {
+        VBox enterAccountLayout = new VBox(20);
+        enterAccountLayout.setPadding(new Insets(20));
+        enterAccountLayout.setStyle("-fx-background-color: white;");
+
+        Label enterNewAccountPageLabel = new Label("Create New Account");
+        enterNewAccountPageLabel.setStyle("-fx-font-size: 24px; -fx-text-fill: #1e4b35 ; -fx-font-weight: bold;");
+
         GridPane createAccountPane = new GridPane();
         createAccountPane.setPadding(new Insets(10));
         createAccountPane.setHgap(10);
-        createAccountPane.setVgap(10);
+        createAccountPane.setVgap(20);
 
         accountNameField = new TextField();
         openingDatePicker = new DatePicker(LocalDate.now());
         openingBalanceField = new TextField();
 
+        // Define button styles
+        String buttonStyle = "-fx-background-color: #cbdfd6;";
+        String hoverStyle = "-fx-background-color: #749485; -fx-text-fill: white;";
+
+        // Add a "Submit" button to save account details
         Button submitButton = new Button("Submit");
         submitButton.setOnAction(e -> createAccount());
+        submitButton.setStyle(buttonStyle);
+        submitButton.setOnMouseEntered(e -> submitButton.setStyle(hoverStyle));
+        submitButton.setOnMouseExited(e -> submitButton.setStyle(buttonStyle));
 
         // Add a "Back" button to return to the home page
         Button backButton = new Button("Back");
         backButton.setOnAction(e -> primaryStage.setScene(createHomeScene()));
+        backButton.setStyle(buttonStyle);
+        backButton.setOnMouseEntered(e -> backButton.setStyle(hoverStyle));
+        backButton.setOnMouseExited(e -> backButton.setStyle(buttonStyle));
 
         // Add components to the grid
         createAccountPane.add(new Label("Account Name:"), 0, 0);
@@ -127,9 +178,12 @@ public class Main extends Application {
         createAccountPane.add(new Label("Opening Balance:"), 0, 2);
         createAccountPane.add(openingBalanceField, 1, 2);
         createAccountPane.add(submitButton, 1, 3);
-        createAccountPane.add(backButton, 0, 3); // Add the "Back" button to the same row as the "Submit" button
+        createAccountPane.add(backButton, 0, 3);
 
-        return new Scene(createAccountPane, 800, 640);
+        enterAccountLayout.getChildren().addAll(enterNewAccountPageLabel, createAccountPane);
+        enterAccountLayout.setAlignment(Pos.TOP_CENTER);
+
+        return new Scene(enterAccountLayout, 800,640);
     }
 
     private void createAccount() {
@@ -185,12 +239,23 @@ public class Main extends Application {
     }
 
     private Scene createAddTransactionTypeScene() {
+        VBox enterTransactionTypeLayout = new VBox(20);
+        enterTransactionTypeLayout.setPadding(new Insets(20));
+        enterTransactionTypeLayout.setStyle("-fx-background-color: white;");
+
+        Label addTransactionTypePageLabel = new Label("Add Transaction Type");
+        addTransactionTypePageLabel.setStyle("-fx-font-size: 24px; -fx-text-fill: #1e4b35 ; -fx-font-weight: bold;");
+
         GridPane addTransactionTypePane = new GridPane();
         addTransactionTypePane.setPadding(new Insets(10));
         addTransactionTypePane.setHgap(10);
-        addTransactionTypePane.setVgap(10);
+        addTransactionTypePane.setVgap(20);
 
         TextField transactionTypeNameField = new TextField();
+
+        // Define button styles
+        String buttonStyle = "-fx-background-color: #cbdfd6;";
+        String hoverStyle = "-fx-background-color: #749485; -fx-text-fill: white;";
 
         Button submitButton = new Button("Submit");
         submitButton.setOnAction(e -> {
@@ -208,40 +273,58 @@ public class Main extends Application {
 
             if (dbHelper.addTransactionType(transactionTypeName)) {
                 showAlert("Success", "Transaction type added successfully!");
-                transactionTypeComboBox.getItems().add(transactionTypeName); // Update ComboBox
+                transactionTypeComboBox.getItems().add(transactionTypeName);
                 primaryStage.setScene(createEnterTransactionsScene());
             } else {
                 showAlert("Error", "Failed to add transaction type.");
             }
         });
+        submitButton.setStyle(buttonStyle);
+        submitButton.setOnMouseEntered(e -> submitButton.setStyle(hoverStyle));
+        submitButton.setOnMouseExited(e -> submitButton.setStyle(buttonStyle));
 
         Button backButton = new Button("Back");
         backButton.setOnAction(e -> primaryStage.setScene(createHomeScene()));
+        backButton.setStyle(buttonStyle);
+        backButton.setOnMouseEntered(e -> backButton.setStyle(hoverStyle));
+        backButton.setOnMouseExited(e -> backButton.setStyle(buttonStyle));
 
         addTransactionTypePane.add(new Label("Transaction Type Name:"), 0, 0);
         addTransactionTypePane.add(transactionTypeNameField, 1, 0);
         addTransactionTypePane.add(submitButton, 1, 1);
         addTransactionTypePane.add(backButton, 0, 1);
 
-        return new Scene(addTransactionTypePane, 400, 200);
+        enterTransactionTypeLayout.getChildren().addAll(addTransactionTypePageLabel, addTransactionTypePane);
+        enterTransactionTypeLayout.setAlignment(Pos.TOP_CENTER);
+
+        return new Scene(enterTransactionTypeLayout, 800, 640);
     }
 
 
     // Adnan added-modified-start
     private Scene createEnterTransactionsScene() {
+        VBox enterTransactionLayout = new VBox(20);
+        enterTransactionLayout.setPadding(new Insets(20));
+        enterTransactionLayout.setStyle("-fx-background-color: white;");
+
+        Label createTransactionPageLabel = new Label("Create New Transaction");
+        createTransactionPageLabel.setStyle("-fx-font-size: 24px; -fx-text-fill: #1e4b35 ; -fx-font-weight: bold;");
+
         GridPane enterTransactionPane = new GridPane();
         enterTransactionPane.setPadding(new Insets(10));
         enterTransactionPane.setHgap(10);
-        enterTransactionPane.setVgap(10);
+        enterTransactionPane.setVgap(20);
 
         accountComboBox = new ComboBox<>();
         accountComboBox.getItems().addAll(dbHelper.getAllAccountNames());
+        accountComboBox.setStyle("-fx-background-color: #cbdfd6; -fx-text-fill: black;");
         if (!accountComboBox.getItems().isEmpty()) {
             accountComboBox.setValue(accountComboBox.getItems().get(0));
         }
 
         transactionTypeComboBox = new ComboBox<>();
         transactionTypeComboBox.getItems().addAll(dbHelper.getAllTransactionTypes());
+        transactionTypeComboBox.setStyle("-fx-background-color: #cbdfd6; -fx-text-fill: black;");
         transactionTypeComboBox.setValue(transactionTypeComboBox.getItems().isEmpty() ? null : transactionTypeComboBox.getItems().get(0));
 
         transactionDatePicker = new DatePicker(LocalDate.now());
@@ -249,11 +332,21 @@ public class Main extends Application {
         paymentAmountField = new TextField();
         depositAmountField = new TextField();
 
+        // Define button styles
+        String buttonStyle = "-fx-background-color: #cbdfd6;";
+        String hoverStyle = "-fx-background-color: #749485; -fx-text-fill: white;";
+
         Button submitButton = new Button("Submit");
         submitButton.setOnAction(e -> saveTransaction());
+        submitButton.setStyle(buttonStyle);
+        submitButton.setOnMouseEntered(e -> submitButton.setStyle(hoverStyle));
+        submitButton.setOnMouseExited(e -> submitButton.setStyle(buttonStyle));
 
         Button backButton = new Button("Back");
         backButton.setOnAction(e -> primaryStage.setScene(createHomeScene()));
+        backButton.setStyle(buttonStyle);
+        backButton.setOnMouseEntered(e -> backButton.setStyle(hoverStyle));
+        backButton.setOnMouseExited(e -> backButton.setStyle(buttonStyle));
 
         enterTransactionPane.add(new Label("Account:"), 0, 0);
         enterTransactionPane.add(accountComboBox, 1, 0);
@@ -270,7 +363,10 @@ public class Main extends Application {
         enterTransactionPane.add(submitButton, 1, 6);
         enterTransactionPane.add(backButton, 0, 6);
 
-        return new Scene(enterTransactionPane, 800, 640);
+        enterTransactionLayout.getChildren().addAll(createTransactionPageLabel, enterTransactionPane);
+        enterTransactionLayout.setAlignment(Pos.TOP_CENTER);
+
+        return new Scene(enterTransactionLayout, 800, 640);
     }
 
 
