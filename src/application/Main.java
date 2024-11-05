@@ -52,10 +52,10 @@ public class Main extends Application {
 
         // Create MenuItems
         MenuItem viewTransactionsMenuItem = new MenuItem("View Transactions");
-//        viewTransactionsMenuItem.setOnAction(e -> primaryStage.setScene(createTransactionsScene()));
+        viewTransactionsMenuItem.setOnAction(e -> primaryStage.setScene(createTransactionsScene()));
 
         MenuItem viewScheduledTransactionsMenuItem = new MenuItem("View Scheduled Transactions");
-//        viewScheduledTransactionsMenuItem.setOnAction(e -> primaryStage.setScene(createScheduledTransactionsScene()));
+        viewScheduledTransactionsMenuItem.setOnAction(e -> primaryStage.setScene(createScheduledTransactionsScene()));
 
         // Add MenuItems to the Menu
         actionsMenu.getItems().addAll(viewTransactionsMenuItem, viewScheduledTransactionsMenuItem);
@@ -96,7 +96,7 @@ public class Main extends Application {
         // Adnan added-modified-end
 
         Button enterScheduledTransactionsButton = new Button("Create New Scheduled Transaction");
-//        enterScheduledTransactionsButton.setOnAction(e -> primaryStage.setScene(createEnterScheduledTransactionsScene()));
+        enterScheduledTransactionsButton.setOnAction(e -> primaryStage.setScene(createEnterScheduledTransactionsScene()));
         enterScheduledTransactionsButton.setStyle(buttonStyle);
         enterScheduledTransactionsButton.setOnMouseEntered(e -> enterScheduledTransactionsButton.setStyle(hoverStyle));
         enterScheduledTransactionsButton.setOnMouseExited(e -> enterScheduledTransactionsButton.setStyle(buttonStyle));
@@ -419,6 +419,36 @@ public class Main extends Application {
         }
     }
     // Adnan added-modified-end
+
+    private Scene createTransactionsScene() {
+        VBox placeholderLayout = new VBox(20);
+        placeholderLayout.setPadding(new Insets(20));
+        placeholderLayout.setAlignment(Pos.CENTER);
+        Label placeholderLabel = new Label("ToDo: View Transactions Page");
+        placeholderLayout.getChildren().add(placeholderLabel);
+
+        return new Scene(placeholderLayout, 800, 640);
+    }
+
+    private Scene createEnterScheduledTransactionsScene() {
+        VBox placeholderLayout = new VBox(20);
+        placeholderLayout.setPadding(new Insets(20));
+        placeholderLayout.setAlignment(Pos.CENTER);
+        Label placeholderLabel = new Label("ToDo: Enter Scheduled Transaction Page");
+        placeholderLayout.getChildren().add(placeholderLabel);
+
+        return new Scene(placeholderLayout, 800, 640);
+    }
+
+    private Scene createScheduledTransactionsScene() {
+        VBox placeholderLayout = new VBox(20);
+        placeholderLayout.setPadding(new Insets(20));
+        placeholderLayout.setAlignment(Pos.CENTER);
+        Label placeholderLabel = new Label("ToDo: View Scheduled Transactions Page");
+        placeholderLayout.getChildren().add(placeholderLabel);
+
+        return new Scene(placeholderLayout, 800, 640);
+    }
 
     public static void main(String[] args) {
         launch(args);
