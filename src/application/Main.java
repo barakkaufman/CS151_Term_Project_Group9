@@ -126,11 +126,11 @@ public class Main extends Application {
 
         TableColumn<Account, Date> dateColumn = new TableColumn<>("Opening Date");
         dateColumn.setCellValueFactory(new PropertyValueFactory<>("openingDate"));
-        dateColumn.setStyle("-fx-text-fill: #749485;");
+        dateColumn.setStyle("-fx-text-fill: #1e4b35;");
 
         TableColumn<Account, Double> balanceColumn = new TableColumn<>("Opening Balance");
         balanceColumn.setCellValueFactory(new PropertyValueFactory<>("openingBalance"));
-        balanceColumn.setStyle("-fx-text-fill: #749485;");
+        balanceColumn.setStyle("-fx-text-fill: #1e4b35;");
 
         accountTable.getColumns().addAll(nameColumn, dateColumn, balanceColumn);
     }
@@ -171,17 +171,18 @@ public class Main extends Application {
         backButton.setOnMouseExited(e -> backButton.setStyle(buttonStyle));
 
         // Add components to the grid
-        createAccountPane.add(new Label("Account Name:"), 0, 0);
-        createAccountPane.add(accountNameField, 1, 0);
-        createAccountPane.add(new Label("Opening Date:"), 0, 1);
-        createAccountPane.add(openingDatePicker, 1, 1);
-        createAccountPane.add(new Label("Opening Balance:"), 0, 2);
-        createAccountPane.add(openingBalanceField, 1, 2);
-        createAccountPane.add(submitButton, 1, 3);
-        createAccountPane.add(backButton, 0, 3);
+        createAccountPane.add(backButton, 0, 0);
+        createAccountPane.add(new Label("Account Name:"), 0, 1);
+        createAccountPane.add(accountNameField, 1, 1);
+        createAccountPane.add(new Label("Opening Date:"), 0, 2);
+        createAccountPane.add(openingDatePicker, 1, 2);
+        createAccountPane.add(new Label("Opening Balance:"), 0, 3);
+        createAccountPane.add(openingBalanceField, 1, 3);
+        createAccountPane.add(submitButton, 1, 4);
 
         enterAccountLayout.getChildren().addAll(enterNewAccountPageLabel, createAccountPane);
         enterAccountLayout.setAlignment(Pos.TOP_CENTER);
+        createAccountPane.setAlignment(Pos.CENTER);
 
         return new Scene(enterAccountLayout, 800,640);
     }
@@ -289,13 +290,14 @@ public class Main extends Application {
         backButton.setOnMouseEntered(e -> backButton.setStyle(hoverStyle));
         backButton.setOnMouseExited(e -> backButton.setStyle(buttonStyle));
 
-        addTransactionTypePane.add(new Label("Transaction Type Name:"), 0, 0);
-        addTransactionTypePane.add(transactionTypeNameField, 1, 0);
-        addTransactionTypePane.add(submitButton, 1, 1);
-        addTransactionTypePane.add(backButton, 0, 1);
+        addTransactionTypePane.add(backButton, 0, 0);
+        addTransactionTypePane.add(new Label("Transaction Type Name:"), 0, 1);
+        addTransactionTypePane.add(transactionTypeNameField, 1, 1);
+        addTransactionTypePane.add(submitButton, 1, 3);
 
         enterTransactionTypeLayout.getChildren().addAll(addTransactionTypePageLabel, addTransactionTypePane);
         enterTransactionTypeLayout.setAlignment(Pos.TOP_CENTER);
+        addTransactionTypePane.setAlignment(Pos.CENTER);
 
         return new Scene(enterTransactionTypeLayout, 800, 640);
     }
@@ -348,23 +350,24 @@ public class Main extends Application {
         backButton.setOnMouseEntered(e -> backButton.setStyle(hoverStyle));
         backButton.setOnMouseExited(e -> backButton.setStyle(buttonStyle));
 
-        enterTransactionPane.add(new Label("Account:"), 0, 0);
-        enterTransactionPane.add(accountComboBox, 1, 0);
-        enterTransactionPane.add(new Label("Transaction Type:"), 0, 1);
-        enterTransactionPane.add(transactionTypeComboBox, 1, 1);
-        enterTransactionPane.add(new Label("Transaction Date:"), 0, 2);
-        enterTransactionPane.add(transactionDatePicker, 1, 2);
-        enterTransactionPane.add(new Label("Transaction Description:"), 0, 3);
-        enterTransactionPane.add(transactionDescriptionField, 1, 3);
-        enterTransactionPane.add(new Label("Payment Amount:"), 0, 4);
-        enterTransactionPane.add(paymentAmountField, 1, 4);
-        enterTransactionPane.add(new Label("Deposit Amount:"), 0, 5);
-        enterTransactionPane.add(depositAmountField, 1, 5);
-        enterTransactionPane.add(submitButton, 1, 6);
-        enterTransactionPane.add(backButton, 0, 6);
+        enterTransactionPane.add(backButton, 0, 0);
+        enterTransactionPane.add(new Label("Account:"), 0, 1);
+        enterTransactionPane.add(accountComboBox, 1, 1);
+        enterTransactionPane.add(new Label("Transaction Type:"), 0, 2);
+        enterTransactionPane.add(transactionTypeComboBox, 1, 2);
+        enterTransactionPane.add(new Label("Transaction Date:"), 0, 3);
+        enterTransactionPane.add(transactionDatePicker, 1, 3);
+        enterTransactionPane.add(new Label("Transaction Description:"), 0, 4);
+        enterTransactionPane.add(transactionDescriptionField, 1, 4);
+        enterTransactionPane.add(new Label("Payment Amount:"), 0, 5);
+        enterTransactionPane.add(paymentAmountField, 1, 5);
+        enterTransactionPane.add(new Label("Deposit Amount:"), 0, 6);
+        enterTransactionPane.add(depositAmountField, 1, 6);
+        enterTransactionPane.add(submitButton, 1, 7);
 
         enterTransactionLayout.getChildren().addAll(createTransactionPageLabel, enterTransactionPane);
         enterTransactionLayout.setAlignment(Pos.TOP_CENTER);
+        enterTransactionPane.setAlignment(Pos.CENTER);
 
         return new Scene(enterTransactionLayout, 800, 640);
     }
