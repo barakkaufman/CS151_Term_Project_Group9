@@ -22,6 +22,9 @@ public class Main extends Application {
     private DatePicker openingDatePicker;
     private TextField openingBalanceField;
     private TableView<Account> accountTable;
+    private TableView<ScheduledTransaction> scheduledTransactionsTable;
+    private TableView<Transaction> transactionsTable;
+
 
     // Adnan added-modified-start transaction fields
     private ComboBox<String> accountComboBox;
@@ -30,6 +33,9 @@ public class Main extends Application {
     private TextField transactionDescriptionField;
     private TextField paymentAmountField;
     private TextField depositAmountField;
+    private TextField scheduledNameField;
+    private ComboBox<String> frequencyComboBox;
+    private TextField dueDateField;
     // Adnan added-modified-end
 
     @Override
@@ -135,6 +141,58 @@ public class Main extends Application {
         accountTable.getColumns().addAll(nameColumn, dateColumn, balanceColumn);
     }
 
+    private void setupScheduledTransactionsTable() {
+        scheduledTransactionsTable = new TableView<>();
+
+        TableColumn<ScheduledTransaction, String> scheduleNameColumn = new TableColumn<>("Schedule Name");
+        scheduleNameColumn.setCellValueFactory(new PropertyValueFactory<>("scheduleName"));
+
+        TableColumn<ScheduledTransaction, String> accountNameColumn = new TableColumn<>("Account Name");
+        accountNameColumn.setCellValueFactory(new PropertyValueFactory<>("accountName"));
+
+        TableColumn<ScheduledTransaction, String> transactionTypeColumn = new TableColumn<>("Transaction Type");
+        transactionTypeColumn.setCellValueFactory(new PropertyValueFactory<>("transactionType"));
+
+        TableColumn<ScheduledTransaction, String> frequencyColumn = new TableColumn<>("Frequency");
+        frequencyColumn.setCellValueFactory(new PropertyValueFactory<>("frequency"));
+
+        TableColumn<ScheduledTransaction, Double> dueDateColumn = new TableColumn<>("Due Date");
+        dueDateColumn.setCellValueFactory(new PropertyValueFactory<>("dueDate"));
+
+        TableColumn<ScheduledTransaction, Double> paymentAmountColumn = new TableColumn<>("Payment Amount");
+        paymentAmountColumn.setCellValueFactory(new PropertyValueFactory<>("paymentAmount"));
+
+        // Add columns to the TableView
+        scheduledTransactionsTable.getColumns().addAll(scheduleNameColumn, accountNameColumn,
+                transactionTypeColumn, frequencyColumn, dueDateColumn, paymentAmountColumn);
+    }
+
+    private void setupTransactionsTable() {
+        transactionsTable = new TableView<>();
+
+        TableColumn<Transaction, String> accountNameColumn = new TableColumn<>("Account Name");
+        accountNameColumn.setCellValueFactory(new PropertyValueFactory<>("accountName"));
+
+        TableColumn<Transaction, String> transactionTypeColumn = new TableColumn<>("Transaction Type");
+        transactionTypeColumn.setCellValueFactory(new PropertyValueFactory<>("transactionType"));
+
+        TableColumn<Transaction, String> transactionDateColumn = new TableColumn<>("Transaction Date");
+        transactionDateColumn.setCellValueFactory(new PropertyValueFactory<>("transactionDate"));
+
+        TableColumn<Transaction, String> transactionDescriptionColumn = new TableColumn<>("Transaction Description");
+        transactionDescriptionColumn.setCellValueFactory(new PropertyValueFactory<>("description"));
+
+        TableColumn<Transaction, Double> paymentAmountColumn = new TableColumn<>("Payment Amount");
+        paymentAmountColumn.setCellValueFactory(new PropertyValueFactory<>("paymentAmount"));
+
+        TableColumn<Transaction, Double> depositAmountColumn = new TableColumn<>("Deposit Amount");
+        depositAmountColumn.setCellValueFactory(new PropertyValueFactory<>("depositAmount"));
+
+        // Add columns to the TableView
+        transactionsTable.getColumns().addAll(accountNameColumn,
+                transactionTypeColumn, transactionDateColumn, transactionDescriptionColumn, paymentAmountColumn, depositAmountColumn);
+    }
+
     private Scene createCreateAccountScene() {
         VBox enterAccountLayout = new VBox(20);
         enterAccountLayout.setPadding(new Insets(20));
@@ -228,6 +286,20 @@ public class Main extends Application {
         // Get account details from the database
         for (Account accountDetail : dbHelper.getAllAccountDetails()) {
             accountTable.getItems().add(accountDetail);
+        }
+    }
+
+    private void refreshScheduledTransactionsTable() {
+        scheduledTransactionsTable.getItems().clear();
+        for (ScheduledTransaction scheduledTransactionDetail : dbHelper.getScheduledTransactions()){
+            scheduledTransactionsTable.getItems().add(scheduledTransactionDetail);
+        }
+    }
+
+    private void refreshTransactionsTable() {
+        transactionsTable.getItems().clear();
+        for (Transaction transactionDetail : dbHelper.getTransactions()){
+            transactionsTable.getItems().add(transactionDetail);
         }
     }
 
@@ -421,34 +493,203 @@ public class Main extends Application {
     // Adnan added-modified-end
 
     private Scene createTransactionsScene() {
-        VBox placeholderLayout = new VBox(20);
-        placeholderLayout.setPadding(new Insets(20));
-        placeholderLayout.setAlignment(Pos.CENTER);
-        Label placeholderLabel = new Label("ToDo: View Transactions Page");
-        placeholderLayout.getChildren().add(placeholderLabel);
+        VBox TransactionsLayout = new VBox(20);
+        TransactionsLayout.setPadding(new Insets(20));
+        TransactionsLayout.setAlignment(Pos.CENTER);
 
-        return new Scene(placeholderLayout, 800, 640);
+        Label homePageLabel = new Label("Transactions");
+        homePageLabel.setStyle("-fx-font-size: 24px; -fx-text-fill: #1e4b35; -fx-font-weight: bold;");
+
+        GridPane enterTransactionPane = new GridPane();
+        enterTransactionPane.setPadding(new Insets(10));
+        enterTransactionPane.setHgap(10);
+        enterTransactionPane.setVgap(20);
+
+        String buttonStyle = "-fx-background-color: #cbdfd6;";
+        String hoverStyle = "-fx-background-color: #749485; -fx-text-fill: white;";
+        Button backButton = new Button("Back");
+
+        backButton.setOnAction(e -> primaryStage.setScene(createHomeScene()));
+        backButton.setStyle(buttonStyle);
+        backButton.setOnMouseEntered(e -> backButton.setStyle(hoverStyle));
+        backButton.setOnMouseExited(e -> backButton.setStyle(buttonStyle));
+
+        // Add back button to the GridPane
+        enterTransactionPane.add(backButton, 0, 0);
+
+        // Initialize and set up the TableView
+        transactionsTable = new TableView<>();
+        setupTransactionsTable();
+        refreshTransactionsTable();
+
+        // Add components to the layout, including enterTransactionPane
+        TransactionsLayout.getChildren().addAll(enterTransactionPane, homePageLabel, transactionsTable);
+
+        return new Scene(TransactionsLayout, 800, 640);
     }
 
     private Scene createEnterScheduledTransactionsScene() {
-        VBox placeholderLayout = new VBox(20);
-        placeholderLayout.setPadding(new Insets(20));
-        placeholderLayout.setAlignment(Pos.CENTER);
-        Label placeholderLabel = new Label("ToDo: Enter Scheduled Transaction Page");
-        placeholderLayout.getChildren().add(placeholderLabel);
+        VBox enterScheduledTransactionLayout = new VBox(20);
+        enterScheduledTransactionLayout.setPadding(new Insets(20));
+        enterScheduledTransactionLayout.setStyle("-fx-background-color: white;");
 
-        return new Scene(placeholderLayout, 800, 640);
+        Label createTransactionPageLabel = new Label("Create New Scheduled Transaction");
+        createTransactionPageLabel.setStyle("-fx-font-size: 24px; -fx-text-fill: #1e4b35 ; -fx-font-weight: bold;");
+
+        GridPane enterTransactionPane = new GridPane();
+        enterTransactionPane.setPadding(new Insets(10));
+        enterTransactionPane.setHgap(10);
+        enterTransactionPane.setVgap(20);
+
+        scheduledNameField = new TextField();
+        scheduledNameField.setPromptText("Enter schedule's name");
+        accountComboBox = new ComboBox<>();
+        accountComboBox.getItems().addAll(dbHelper.getAllAccountNames());
+        accountComboBox.setStyle("-fx-background-color: #cbdfd6; -fx-text-fill: black;");
+        if (!accountComboBox.getItems().isEmpty()) {
+            accountComboBox.setValue(accountComboBox.getItems().get(0));
+        }
+
+        transactionTypeComboBox = new ComboBox<>();
+        transactionTypeComboBox.getItems().addAll(dbHelper.getAllTransactionTypes());
+        transactionTypeComboBox.setStyle("-fx-background-color: #cbdfd6; -fx-text-fill: black;");
+        transactionTypeComboBox.setValue(transactionTypeComboBox.getItems().isEmpty() ? null : transactionTypeComboBox.getItems().get(0));
+
+        transactionDatePicker = new DatePicker(LocalDate.now());
+        transactionDescriptionField = new TextField();
+        paymentAmountField = new TextField();
+        depositAmountField = new TextField();
+
+        frequencyComboBox = new ComboBox<>();
+        frequencyComboBox.setStyle("-fx-background-color: #cbdfd6; -fx-text-fill: black;");
+        frequencyComboBox.getItems().add("Monthly");
+        frequencyComboBox.setValue("Monthly");
+
+        dueDateField = new TextField();
+        dueDateField.setPromptText("Enter day of the month");
+
+        // Define button styles
+        String buttonStyle = "-fx-background-color: #cbdfd6;";
+        String hoverStyle = "-fx-background-color: #749485; -fx-text-fill: white;";
+
+        Button submitButton = new Button("Submit");
+        submitButton.setOnAction(e -> saveScheduledTransaction());
+        submitButton.setStyle(buttonStyle);
+        submitButton.setOnMouseEntered(e -> submitButton.setStyle(hoverStyle));
+        submitButton.setOnMouseExited(e -> submitButton.setStyle(buttonStyle));
+
+        Button backButton = new Button("Back");
+        backButton.setOnAction(e -> primaryStage.setScene(createHomeScene()));
+        backButton.setStyle(buttonStyle);
+        backButton.setOnMouseEntered(e -> backButton.setStyle(hoverStyle));
+        backButton.setOnMouseExited(e -> backButton.setStyle(buttonStyle));
+
+        enterTransactionPane.add(backButton, 0, 0);
+        enterTransactionPane.add(new Label("Schedule's Name:"), 1, 0);
+        enterTransactionPane.add(scheduledNameField, 1, 0);
+        enterTransactionPane.add(new Label("Account:"), 0, 1);
+        enterTransactionPane.add(accountComboBox, 1, 1);
+        enterTransactionPane.add(new Label("Transaction Type:"), 0, 2);
+        enterTransactionPane.add(transactionTypeComboBox, 1, 2);
+        enterTransactionPane.add(new Label("Frequency:"), 0, 3);
+        enterTransactionPane.add(frequencyComboBox, 1, 3);
+        enterTransactionPane.add(new Label("Due Date:"), 0, 4);
+        enterTransactionPane.add(dueDateField, 1, 4);
+        enterTransactionPane.add(new Label("Payment Amount:"), 0, 5);
+        enterTransactionPane.add(paymentAmountField, 1, 5);
+        enterTransactionPane.add(submitButton, 1, 7);
+
+        enterScheduledTransactionLayout.getChildren().addAll(createTransactionPageLabel, enterTransactionPane);
+        enterScheduledTransactionLayout.setAlignment(Pos.TOP_CENTER);
+        enterTransactionPane.setAlignment(Pos.CENTER);
+
+        return new Scene(enterScheduledTransactionLayout, 800, 640);
     }
+
+    private void saveScheduledTransaction() {
+        String scheduleName = scheduledNameField.getText();
+        String accountName = accountComboBox.getValue();
+        String transactionType = transactionTypeComboBox.getValue();
+        String frequency = frequencyComboBox.getValue();
+        String dueDate = dueDateField.getText();
+        String paymentAmountText = paymentAmountField.getText();
+
+        // Validate required fields
+        if (scheduleName.isEmpty() || accountName == null || transactionType == null || frequency == null || dueDate.isEmpty()) {
+
+            showAlert("Error", "Please fill in all required fields.");
+            return;
+        }
+
+        // Validate amounts
+        if (paymentAmountText.isEmpty()) {
+            showAlert("Error", "Please enter either a payment amount.");
+            return;
+        }
+
+        double paymentAmount = 0;
+
+        try {
+            if (!paymentAmountText.isEmpty()) {
+                paymentAmount = Double.parseDouble(paymentAmountText);
+            }
+
+        } catch (NumberFormatException e) {
+            showAlert("Error", "Please enter valid numbers for amounts.");
+            return;
+        }
+
+        // Save transaction to database
+        if (dbHelper.saveScheduledTransaction(scheduleName, accountName, transactionType, frequency, dueDate, paymentAmount)){
+            showAlert("Success", "Transaction saved successfully!");
+            primaryStage.setScene(createScheduledTransactionsScene());
+        }
+        else {
+            showAlert("Error", "Failed to save transaction.");
+        }
+    }
+
+
 
     private Scene createScheduledTransactionsScene() {
-        VBox placeholderLayout = new VBox(20);
-        placeholderLayout.setPadding(new Insets(20));
-        placeholderLayout.setAlignment(Pos.CENTER);
-        Label placeholderLabel = new Label("ToDo: View Scheduled Transactions Page");
-        placeholderLayout.getChildren().add(placeholderLabel);
+        VBox scheduledTransactionsLayout = new VBox(20);
+        scheduledTransactionsLayout.setPadding(new Insets(20));
+        scheduledTransactionsLayout.setAlignment(Pos.CENTER);
 
-        return new Scene(placeholderLayout, 800, 640);
+        Label homePageLabel = new Label("Scheduled Transactions");
+        homePageLabel.setStyle("-fx-font-size: 24px; -fx-text-fill: #1e4b35; -fx-font-weight: bold;");
+
+        GridPane enterTransactionPane = new GridPane();
+        enterTransactionPane.setPadding(new Insets(10));
+        enterTransactionPane.setHgap(10);
+        enterTransactionPane.setVgap(20);
+
+        String buttonStyle = "-fx-background-color: #cbdfd6;";
+        String hoverStyle = "-fx-background-color: #749485; -fx-text-fill: white;";
+        Button backButton = new Button("Back");
+
+        backButton.setOnAction(e -> primaryStage.setScene(createHomeScene()));
+        backButton.setStyle(buttonStyle);
+        backButton.setOnMouseEntered(e -> backButton.setStyle(hoverStyle));
+        backButton.setOnMouseExited(e -> backButton.setStyle(buttonStyle));
+
+        // Add back button to the GridPane
+        enterTransactionPane.add(backButton, 0, 0);
+
+        // Initialize and set up the TableView
+        scheduledTransactionsTable = new TableView<>();
+        setupScheduledTransactionsTable();
+        refreshScheduledTransactionsTable();
+
+        // Add components to the layout, including enterTransactionPane
+        scheduledTransactionsLayout.getChildren().addAll(enterTransactionPane, homePageLabel, scheduledTransactionsTable);
+
+        return new Scene(scheduledTransactionsLayout, 800, 640);
     }
+
+
+
+
 
     public static void main(String[] args) {
         launch(args);

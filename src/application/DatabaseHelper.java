@@ -15,6 +15,8 @@ public class DatabaseHelper {
             createAccountTable();
             createTransactionTable();
             createTransactionTypeTable();
+            createSchedulesTable();
+            createScheduledTransactionTable();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -59,6 +61,21 @@ public class DatabaseHelper {
         }
     }
 
+    public boolean scheduleNameExists(String scheduleName) {
+        String query = "SELECT COUNT(*) FROM scheduled_transactions WHERE schedule_name = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setString(1, scheduleName);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1) > 0;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+
 
     public List<String> getAllTransactionTypes() {
         List<String> transactionTypes = new ArrayList<>();
@@ -72,6 +89,52 @@ public class DatabaseHelper {
             e.printStackTrace();
         }
         return transactionTypes;
+    }
+
+    public List<ScheduledTransaction> getScheduledTransactions()  {
+        List<ScheduledTransaction> transactions = new ArrayList<>();
+        String sql = "SELECT schedule_name, account_name, transaction_type, frequency, due_date, payment_amount FROM scheduled_transactions";
+        try (Statement stmt = connection.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+            while (rs.next()) {
+                transactions.add(new ScheduledTransaction(
+                        rs.getString("schedule_name"),
+                        rs.getString("account_name"),
+                        rs.getString("transaction_type"),
+                        rs.getString("frequency"),
+                        rs.getDouble("due_date"),
+                        rs.getDouble("payment_amount")
+                ));
+            }
+
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return transactions;
+    }
+
+    public List<Transaction> getTransactions()  {
+        List<Transaction> trans = new ArrayList<>();
+        String sql = "SELECT account_name, transaction_type, transaction_date, description, payment_amount, deposit_amount FROM transactions";
+        try (Statement stmt = connection.createStatement();
+             ResultSet res = stmt.executeQuery(sql)) {
+            while (res.next()) {
+                trans.add(new Transaction(
+                        res.getString("account_name"),
+                        res.getString("transaction_type"),
+                        res.getDate("transaction_date"),
+                        res.getString("description"),
+                        res.getDouble("deposit_amount"),
+                        res.getDouble("payment_amount")
+                ));
+            }
+
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return trans;
     }
 
 
@@ -88,6 +151,39 @@ public class DatabaseHelper {
                 ");";
         try (Statement stmt = connection.createStatement()) {
             stmt.execute(sql);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void createSchedulesTable() {
+        String sql = "CREATE TABLE IF NOT EXISTS schedules (" +
+                "id INTEGER PRIMARY KEY AUTOINCREMENT," +
+                "name TEXT NOT NULL UNIQUE" +
+                ");";
+        try (Statement stmt = connection.createStatement()) {
+            stmt.execute(sql);
+            System.out.println("Created 'schedules' table successfully.");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // Method to create the 'scheduled_transactions' table if it does not exist
+    private void createScheduledTransactionTable() {
+        String sql = "CREATE TABLE IF NOT EXISTS scheduledTransactions (" +
+                "id INTEGER PRIMARY KEY AUTOINCREMENT," +
+                "schedule_name TEXT NOT NULL," +
+                "account_name TEXT NOT NULL," +
+                "transaction_type TEXT NOT NULL," +
+                "frequency TEXT NOT NULL," +
+                "due_date REAL," +
+                "payment_amount REAL," +
+                "FOREIGN KEY (schedule_name) REFERENCES schedules(name)" +
+                ");";
+        try (Statement stmt = connection.createStatement()) {
+            stmt.execute(sql);
+            System.out.println("Created 'scheduledTransactions' table successfully.");
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -111,6 +207,25 @@ public class DatabaseHelper {
             return false;
         }
     }
+
+    public boolean saveScheduledTransaction(String scheduleName, String accountName, String transactionType,
+                                            String frequency, String dueDate, double paymentAmount) {
+        String sql = "INSERT INTO scheduled_transactions (schedule_name, account_name, transaction_type, frequency, due_date, payment_amount) VALUES (?, ?, ?, ?, ?, ?)";
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setString(1, scheduleName);
+            pstmt.setString(2, accountName);
+            pstmt.setString(3, transactionType);
+            pstmt.setString(4, frequency);
+            pstmt.setString(5, dueDate);
+            pstmt.setDouble(6, paymentAmount);
+            pstmt.executeUpdate();
+            return true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
 
     public List<String> getAllAccountNames() {
         List<String> accountNames = new ArrayList<>();
