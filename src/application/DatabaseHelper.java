@@ -116,7 +116,7 @@ public class DatabaseHelper {
 
     public List<Transaction> getTransactions()  {
         List<Transaction> trans = new ArrayList<>();
-        String sql = "SELECT account_name, transaction_type, transaction_date, description, payment_amount, deposit_amount FROM transactions";
+        String sql = "SELECT account_name, transaction_type, transaction_date, description, payment_amount, deposit_amount FROM transactions ORDER BY transaction_date DESC";
         try (Statement stmt = connection.createStatement();
              ResultSet res = stmt.executeQuery(sql)) {
             while (res.next()) {
