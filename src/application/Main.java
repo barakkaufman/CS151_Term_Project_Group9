@@ -621,6 +621,13 @@ public class Main extends Application {
             return;
         }
 
+        // Check if a transaction with the same schedule name already exists
+        if (dbHelper.scheduleNameExists(scheduleName)) {
+            showAlert("Error", "A scheduled transaction with this name already exists.");
+            return;
+        }
+
+
         // Validate amounts
         if (paymentAmountText.isEmpty()) {
             showAlert("Error", "Please enter either a payment amount.");
