@@ -102,7 +102,7 @@ public class DatabaseHelper {
                         rs.getString("account_name"),
                         rs.getString("transaction_type"),
                         rs.getString("frequency"),
-                        rs.getDouble("due_date"),
+                        rs.getInt("due_date"),
                         rs.getDouble("payment_amount")
                 ));
             }
@@ -177,7 +177,7 @@ public class DatabaseHelper {
                 "account_name TEXT NOT NULL," +
                 "transaction_type TEXT NOT NULL," +
                 "frequency TEXT NOT NULL," +
-                "due_date REAL," +
+                "due_date TEXT NOT NULL," +
                 "payment_amount REAL," +
                 "FOREIGN KEY (schedule_name) REFERENCES schedules(name)" +
                 ");";
@@ -290,7 +290,6 @@ public class DatabaseHelper {
         return accountDetails;
     }
 
-
     public boolean accountExists(String accountName) {
         String sql = "SELECT COUNT(*) FROM accounts WHERE name = ?";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
@@ -304,6 +303,19 @@ public class DatabaseHelper {
         }
         return false;
     }
+
+    public boolean deleteAccount(String accountName) {
+        String sql = "DELETE FROM accounts WHERE name = ?";
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setString(1, accountName);
+            int affectedRows = pstmt.executeUpdate();
+            return affectedRows > 0; // Return true if rows were affected
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
 
 }
 

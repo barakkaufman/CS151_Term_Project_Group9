@@ -107,11 +107,16 @@ public class Main extends Application {
         enterScheduledTransactionsButton.setOnMouseEntered(e -> enterScheduledTransactionsButton.setStyle(hoverStyle));
         enterScheduledTransactionsButton.setOnMouseExited(e -> enterScheduledTransactionsButton.setStyle(buttonStyle));
 
+        Button deleteAccountButton = new Button("Delete Selected Account");
+        deleteAccountButton.setStyle(buttonStyle);
+        deleteAccountButton.setOnMouseEntered(e -> deleteAccountButton.setStyle(hoverStyle));
+        deleteAccountButton.setOnMouseExited(e -> deleteAccountButton.setStyle(buttonStyle));
+        deleteAccountButton.setOnAction(e -> deleteSelectedAccount());
 
         // Place buttons in an HBox for horizontal layout
         HBox buttonLayout = new HBox(15);
         buttonLayout.setAlignment(Pos.CENTER);
-        buttonLayout.getChildren().addAll(createAccountButton, addTransactionTypeButton, enterTransactionsButton, enterScheduledTransactionsButton);
+        buttonLayout.getChildren().addAll(createAccountButton, addTransactionTypeButton, enterTransactionsButton, enterScheduledTransactionsButton, deleteAccountButton);
 
         // Add a spacer to create space between the account table and buttons
         Region spacer = new Region();
@@ -123,7 +128,7 @@ public class Main extends Application {
 
         homeLayout.setAlignment(Pos.TOP_CENTER);
 
-        return new Scene(homeLayout, 800, 640);
+        return new Scene(homeLayout, 820, 640);
     }
 
     private void setupAccountTable() {
@@ -156,7 +161,7 @@ public class Main extends Application {
         TableColumn<ScheduledTransaction, String> frequencyColumn = new TableColumn<>("Frequency");
         frequencyColumn.setCellValueFactory(new PropertyValueFactory<>("frequency"));
 
-        TableColumn<ScheduledTransaction, Double> dueDateColumn = new TableColumn<>("Due Date");
+        TableColumn<ScheduledTransaction, Integer> dueDateColumn = new TableColumn<>("Due Date");
         dueDateColumn.setCellValueFactory(new PropertyValueFactory<>("dueDate"));
 
         TableColumn<ScheduledTransaction, Double> paymentAmountColumn = new TableColumn<>("Payment Amount");
@@ -242,7 +247,7 @@ public class Main extends Application {
         enterAccountLayout.setAlignment(Pos.TOP_CENTER);
         createAccountPane.setAlignment(Pos.CENTER);
 
-        return new Scene(enterAccountLayout, 800,640);
+        return new Scene(enterAccountLayout, 820,640);
     }
 
     private void createAccount() {
@@ -371,7 +376,7 @@ public class Main extends Application {
         enterTransactionTypeLayout.setAlignment(Pos.TOP_CENTER);
         addTransactionTypePane.setAlignment(Pos.CENTER);
 
-        return new Scene(enterTransactionTypeLayout, 800, 640);
+        return new Scene(enterTransactionTypeLayout, 820, 640);
     }
 
 
@@ -441,7 +446,7 @@ public class Main extends Application {
         enterTransactionLayout.setAlignment(Pos.TOP_CENTER);
         enterTransactionPane.setAlignment(Pos.CENTER);
 
-        return new Scene(enterTransactionLayout, 800, 640);
+        return new Scene(enterTransactionLayout, 820, 640);
     }
 
 
@@ -525,7 +530,7 @@ public class Main extends Application {
         // Add components to the layout, including enterTransactionPane
         TransactionsLayout.getChildren().addAll(enterTransactionPane, homePageLabel, transactionsTable);
 
-        return new Scene(TransactionsLayout, 800, 640);
+        return new Scene(TransactionsLayout, 820, 640);
     }
 
     private Scene createEnterScheduledTransactionsScene() {
@@ -603,7 +608,7 @@ public class Main extends Application {
         enterScheduledTransactionLayout.setAlignment(Pos.TOP_CENTER);
         enterTransactionPane.setAlignment(Pos.CENTER);
 
-        return new Scene(enterScheduledTransactionLayout, 800, 640);
+        return new Scene(enterScheduledTransactionLayout, 820, 640);
     }
 
     private void saveScheduledTransaction() {
@@ -691,10 +696,24 @@ public class Main extends Application {
         // Add components to the layout, including enterTransactionPane
         scheduledTransactionsLayout.getChildren().addAll(enterTransactionPane, homePageLabel, scheduledTransactionsTable);
 
-        return new Scene(scheduledTransactionsLayout, 800, 640);
+        return new Scene(scheduledTransactionsLayout, 820, 640);
     }
 
+    private void deleteSelectedAccount() {
+        Account selectedAccount = accountTable.getSelectionModel().getSelectedItem();
+        if (selectedAccount == null) {
+            showAlert("Error", "No account selected.");
+            return;
+        }
 
+        boolean isDeleted = dbHelper.deleteAccount(selectedAccount.getName());
+        if (isDeleted) {
+            showAlert("Success", "Account deleted successfully.");
+            refreshAccountTable(); // Refresh the table to show updated data
+        } else {
+            showAlert("Error", "Failed to delete account.");
+        }
+    }
 
 
 

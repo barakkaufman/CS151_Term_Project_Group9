@@ -5,12 +5,12 @@ public class ScheduledTransaction {
     private String accountName;
     private String transactionType;
     private String frequency;
-    private double dueDate;
+    private int dueDate;
     private double paymentAmount;
 
     // Constructor
     public ScheduledTransaction(String scheduleName, String accountName, String transactionType,
-                                String frequency, double dueDate, double paymentAmount) {
+                                String frequency, int dueDate, double paymentAmount) {
         this.scheduleName = scheduleName;
         this.accountName = accountName;
         this.transactionType = transactionType;
@@ -24,7 +24,7 @@ public class ScheduledTransaction {
     public String getAccountName() { return accountName; }
     public String getTransactionType() { return transactionType; }
     public String getFrequency() { return frequency; }
-    public double getDueDate() { return dueDate; }
+    public int getDueDate() { return dueDate; }
     public double getPaymentAmount() { return paymentAmount; }
 }
 
