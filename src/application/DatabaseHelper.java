@@ -93,7 +93,7 @@ public class DatabaseHelper {
 
     public List<ScheduledTransaction> getScheduledTransactions()  {
         List<ScheduledTransaction> transactions = new ArrayList<>();
-        String sql = "SELECT schedule_name, account_name, transaction_type, frequency, due_date, payment_amount FROM scheduled_transactions";
+        String sql = "SELECT schedule_name, account_name, transaction_type, frequency, due_date, payment_amount FROM scheduled_transactions ORDER BY due_date ASC";
         try (Statement stmt = connection.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
             while (rs.next()) {
@@ -310,6 +310,18 @@ public class DatabaseHelper {
             pstmt.setString(1, accountName);
             int affectedRows = pstmt.executeUpdate();
             return affectedRows > 0; // Return true if rows were affected
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public boolean deleteScheduledTransaction(String scheduleName) {
+        String sql = "DELETE FROM scheduled_transactions WHERE schedule_name = ?";
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setString(1, scheduleName);
+            int affectedRows = pstmt.executeUpdate();
+            return affectedRows > 0;
         } catch (SQLException e) {
             e.printStackTrace();
             return false;

@@ -54,7 +54,8 @@ public class Main extends Application {
 
         MenuBar menuBar = new MenuBar();
         menuBar.setStyle("-fx-background-color: #749485;");
-        Menu actionsMenu = new Menu("Pages");
+        Menu pagesMenu = new Menu("Pages");
+        Menu actionsMenu = new Menu("Actions");
 
         // Create MenuItems
         MenuItem viewTransactionsMenuItem = new MenuItem("View Transactions");
@@ -63,11 +64,22 @@ public class Main extends Application {
         MenuItem viewScheduledTransactionsMenuItem = new MenuItem("View Scheduled Transactions");
         viewScheduledTransactionsMenuItem.setOnAction(e -> primaryStage.setScene(createScheduledTransactionsScene()));
 
+        MenuItem AddTransactionTypeMenuItem = new MenuItem("Add Transaction Type");
+        AddTransactionTypeMenuItem.setOnAction(e -> primaryStage.setScene(createAddTransactionTypeScene()));
+
+        MenuItem CreateNewTransactionMenuItem = new MenuItem("Create New Transaction");
+        CreateNewTransactionMenuItem.setOnAction(e -> primaryStage.setScene(createEnterTransactionsScene()));
+
+        MenuItem CreateNewScheduledTransactionMenuItem = new MenuItem("Create New Scheduled Transaction");
+        CreateNewScheduledTransactionMenuItem.setOnAction(e -> primaryStage.setScene(createEnterScheduledTransactionsScene()));
+
         // Add MenuItems to the Menu
-        actionsMenu.getItems().addAll(viewTransactionsMenuItem, viewScheduledTransactionsMenuItem);
+        pagesMenu.getItems().addAll(viewTransactionsMenuItem, viewScheduledTransactionsMenuItem);
+        actionsMenu.getItems().addAll(AddTransactionTypeMenuItem, CreateNewTransactionMenuItem, CreateNewScheduledTransactionMenuItem);
 
         // Add the Menu to the MenuBar
         menuBar.getMenus().add(actionsMenu);
+        menuBar.getMenus().add(pagesMenu);
 
         Label homePageLabel = new Label("Home Page");
         homePageLabel.setStyle("-fx-font-size: 24px; -fx-text-fill: #1e4b35 ; -fx-font-weight: bold;");
@@ -87,26 +99,6 @@ public class Main extends Application {
         createAccountButton.setOnMouseEntered(e -> createAccountButton.setStyle(hoverStyle));
         createAccountButton.setOnMouseExited(e -> createAccountButton.setStyle(buttonStyle));
 
-        Button addTransactionTypeButton = new Button("Add Transaction Type");
-        addTransactionTypeButton.setOnAction(e -> primaryStage.setScene(createAddTransactionTypeScene()));
-        addTransactionTypeButton.setStyle(buttonStyle);
-        addTransactionTypeButton.setOnMouseEntered(e -> addTransactionTypeButton.setStyle(hoverStyle));
-        addTransactionTypeButton.setOnMouseExited(e -> addTransactionTypeButton.setStyle(buttonStyle));
-
-        // Adnan added-modified-start
-        Button enterTransactionsButton = new Button("Create New Transaction");
-        enterTransactionsButton.setOnAction(e -> primaryStage.setScene(createEnterTransactionsScene()));
-        enterTransactionsButton.setStyle(buttonStyle);
-        enterTransactionsButton.setOnMouseEntered(e -> enterTransactionsButton.setStyle(hoverStyle));
-        enterTransactionsButton.setOnMouseExited(e -> enterTransactionsButton.setStyle(buttonStyle));
-        // Adnan added-modified-end
-
-        Button enterScheduledTransactionsButton = new Button("Create New Scheduled Transaction");
-        enterScheduledTransactionsButton.setOnAction(e -> primaryStage.setScene(createEnterScheduledTransactionsScene()));
-        enterScheduledTransactionsButton.setStyle(buttonStyle);
-        enterScheduledTransactionsButton.setOnMouseEntered(e -> enterScheduledTransactionsButton.setStyle(hoverStyle));
-        enterScheduledTransactionsButton.setOnMouseExited(e -> enterScheduledTransactionsButton.setStyle(buttonStyle));
-
         Button deleteAccountButton = new Button("Delete Selected Account");
         deleteAccountButton.setStyle(buttonStyle);
         deleteAccountButton.setOnMouseEntered(e -> deleteAccountButton.setStyle(hoverStyle));
@@ -116,7 +108,7 @@ public class Main extends Application {
         // Place buttons in an HBox for horizontal layout
         HBox buttonLayout = new HBox(15);
         buttonLayout.setAlignment(Pos.CENTER);
-        buttonLayout.getChildren().addAll(createAccountButton, addTransactionTypeButton, enterTransactionsButton, enterScheduledTransactionsButton, deleteAccountButton);
+        buttonLayout.getChildren().addAll(createAccountButton, deleteAccountButton);
 
         // Add a spacer to create space between the account table and buttons
         Region spacer = new Region();
@@ -693,8 +685,14 @@ public class Main extends Application {
         setupScheduledTransactionsTable();
         refreshScheduledTransactionsTable();
 
+        Button deletescheduledTransactionButton = new Button("Delete Selected Scheduled Transaction");
+        deletescheduledTransactionButton.setStyle(buttonStyle);
+        deletescheduledTransactionButton.setOnMouseEntered(e -> deletescheduledTransactionButton.setStyle(hoverStyle));
+        deletescheduledTransactionButton.setOnMouseExited(e -> deletescheduledTransactionButton.setStyle(buttonStyle));
+        deletescheduledTransactionButton.setOnAction(e -> deleteSelectedScheduledTransaction());
+
         // Add components to the layout, including enterTransactionPane
-        scheduledTransactionsLayout.getChildren().addAll(enterTransactionPane, homePageLabel, scheduledTransactionsTable);
+        scheduledTransactionsLayout.getChildren().addAll(enterTransactionPane, homePageLabel, scheduledTransactionsTable, deletescheduledTransactionButton);
 
         return new Scene(scheduledTransactionsLayout, 820, 640);
     }
@@ -712,6 +710,22 @@ public class Main extends Application {
             refreshAccountTable(); // Refresh the table to show updated data
         } else {
             showAlert("Error", "Failed to delete account.");
+        }
+    }
+
+    private void deleteSelectedScheduledTransaction() {
+        ScheduledTransaction selectedScheduledTransaction = scheduledTransactionsTable.getSelectionModel().getSelectedItem();
+        if (selectedScheduledTransaction == null) {
+            showAlert("Error", "No transaction selected.");
+            return;
+        }
+
+        boolean isDeleted = dbHelper.deleteScheduledTransaction(selectedScheduledTransaction.getScheduleName());
+        if (isDeleted) {
+            showAlert("Success", "Transaction deleted successfully.");
+            refreshScheduledTransactionsTable(); // Refresh the table to show updated data
+        } else {
+            showAlert("Error", "Failed to delete transaction.");
         }
     }
 
