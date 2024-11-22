@@ -80,6 +80,15 @@ public class Main extends Application {
         actionsMenu.getItems().add(searchTransactionsMenuItem);
         //Adnan added-modified-end
 
+        
+        //Adnan added-modified-start
+        // Search Scheduled Transactions menu item
+        MenuItem searchScheduledTransactionsMenuItem = new MenuItem("Search Scheduled Transactions");
+        searchScheduledTransactionsMenuItem.setOnAction(e -> 
+        primaryStage.setScene(createSearchScheduledTransactionsScene()));
+        actionsMenu.getItems().add(searchScheduledTransactionsMenuItem);
+        //Adnan added-modified-end
+        
         // Add MenuItems to the Menu
         pagesMenu.getItems().addAll(viewTransactionsMenuItem, viewScheduledTransactionsMenuItem);
         actionsMenu.getItems().addAll(AddTransactionTypeMenuItem, CreateNewTransactionMenuItem, CreateNewScheduledTransactionMenuItem);
