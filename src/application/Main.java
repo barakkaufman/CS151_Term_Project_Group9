@@ -80,7 +80,6 @@ public class Main extends Application {
         actionsMenu.getItems().add(searchTransactionsMenuItem);
         //Adnan added-modified-end
 
-        
         //Adnan added-modified-start
         // Search Scheduled Transactions menu item
         MenuItem searchScheduledTransactionsMenuItem = new MenuItem("Search Scheduled Transactions");
