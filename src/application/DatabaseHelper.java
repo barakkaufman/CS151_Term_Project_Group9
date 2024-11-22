@@ -424,5 +424,55 @@ private int getTransactionCount() {
     return 0;
 } // Adnan added-modified-end
 
+
+// Adnan added-modified-start
+public List<ScheduledTransaction> searchScheduledTransactions(String searchTerm) {
+    List<ScheduledTransaction> transactions = new ArrayList<>();
+    String sql = "SELECT schedule_name, account_name, transaction_type, frequency, " +
+                 "due_date, payment_amount FROM scheduled_transactions " +
+                 "WHERE schedule_name LIKE ? ORDER BY due_date ASC";
+    
+    try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+        pstmt.setString(1, "%" + searchTerm + "%");
+        ResultSet rs = pstmt.executeQuery();
+        
+        while (rs.next()) {
+            transactions.add(new ScheduledTransaction(
+                rs.getString("schedule_name"),
+                rs.getString("account_name"),
+                rs.getString("transaction_type"),
+                rs.getString("frequency"),
+                rs.getInt("due_date"),
+                rs.getDouble("payment_amount")
+            ));
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+    return transactions;
+}
+
+public boolean updateScheduledTransaction(String originalName, String scheduleName, 
+    String accountName, String transactionType, String frequency, 
+    String dueDate, double paymentAmount) {
+    String sql = "UPDATE scheduled_transactions SET schedule_name = ?, account_name = ?, " +
+                 "transaction_type = ?, frequency = ?, due_date = ?, " +
+                 "payment_amount = ? WHERE schedule_name = ?";
+    
+    try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+        pstmt.setString(1, scheduleName);
+        pstmt.setString(2, accountName);
+        pstmt.setString(3, transactionType);
+        pstmt.setString(4, frequency);
+        pstmt.setString(5, dueDate);
+        pstmt.setDouble(6, paymentAmount);
+        pstmt.setString(7, originalName);
+        return pstmt.executeUpdate() > 0;
+    } catch (SQLException e) {
+        e.printStackTrace();
+        return false;
+    }
+}// Adnan added-modified-end
+
 }
 
