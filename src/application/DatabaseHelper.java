@@ -382,16 +382,16 @@ public boolean updateTransaction(int id, String accountName, String transactionT
 public void populateInitialTransactions() {
     if (getTransactionCount() == 0) {
         String[] descriptions = {
-            "Monthly Rent Payment",
-            "Grocery Shopping at Walmart",
-            "Salary Deposit",
-            "Internet Bill Payment",
-            "Car Insurance Premium",
-            "Restaurant Dinner",
-            "Gas Station Fill-up",
-            "Movie Theater Tickets",
-            "Utility Bill Payment",
-            "Phone Bill Payment"
+            "Student Loan Payment",
+            "Car Payment",
+            "Credit Card Payment",
+            "Mortgage Payment",
+            "Amazon Subscription Payment",
+            "Medical Bill Payment",
+            "PG&E Payment",
+            "Phone Bill Payment",
+            "Transfer to ETrade Account",
+            "Donate to RedCross"
         };
 
         double[] amounts = {1200.00, 156.78, 3500.00, 79.99, 145.50,
