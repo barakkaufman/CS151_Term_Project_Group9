@@ -371,7 +371,124 @@ public class Main extends Application {
         return new Scene(enterTransactionTypeLayout, 820, 640);
     }
 
+// Adnan added-modified-start
+private Scene createSearchTransactionsScene() {
+    VBox searchLayout = new VBox(20);
+    searchLayout.setPadding(new Insets(20));
+    searchLayout.setStyle("-fx-background-color: white;");
 
+    Label searchLabel = new Label("Search Transactions");
+    searchLabel.setStyle("-fx-font-size: 24px; -fx-text-fill: #1e4b35; -fx-font-weight: bold;");
+
+    TextField searchField = new TextField();
+    searchField.setPromptText("Enter description to search");
+    
+    Button searchButton = new Button("Search");
+    searchButton.setStyle("-fx-background-color: #cbdfd6;");
+    
+    TableView<Transaction> searchResultsTable = new TableView<>();
+    setupTransactionsTable(searchResultsTable);
+    
+    searchButton.setOnAction(e -> {
+        String searchTerm = searchField.getText().trim();
+        searchResultsTable.getItems().clear();
+        searchResultsTable.getItems().addAll(dbHelper.searchTransactions(searchTerm));
+    });
+    
+    searchResultsTable.setOnMouseClicked(event -> {
+        if (event.getClickCount() == 2) { // Double click
+            Transaction selectedTransaction = searchResultsTable.getSelectionModel().getSelectedItem();
+            if (selectedTransaction != null) {
+                primaryStage.setScene(createEditTransactionScene(selectedTransaction));
+            }
+        }
+    });
+
+    Button backButton = new Button("Back");
+    backButton.setStyle("-fx-background-color: #cbdfd6;");
+    backButton.setOnAction(e -> primaryStage.setScene(createHomeScene()));
+
+    searchLayout.getChildren().addAll(backButton, searchLabel, searchField, 
+                                    searchButton, searchResultsTable);
+    
+    return new Scene(searchLayout, 820, 640);
+}
+
+private Scene createEditTransactionScene(Transaction transaction) {
+    VBox editLayout = new VBox(20);
+    editLayout.setPadding(new Insets(20));
+    editLayout.setStyle("-fx-background-color: white;");
+
+    Label editLabel = new Label("Edit Transaction");
+    editLabel.setStyle("-fx-font-size: 24px; -fx-text-fill: #1e4b35; -fx-font-weight: bold;");
+
+    GridPane editPane = new GridPane();
+    editPane.setHgap(10);
+    editPane.setVgap(10);
+
+    // Create and populate fields
+    ComboBox<String> accountComboBox = new ComboBox<>();
+    accountComboBox.getItems().addAll(dbHelper.getAllAccountNames());
+    accountComboBox.setValue(transaction.getAccountName());
+
+    ComboBox<String> typeComboBox = new ComboBox<>();
+    typeComboBox.getItems().addAll(dbHelper.getAllTransactionTypes());
+    typeComboBox.setValue(transaction.getTransactionType());
+
+    DatePicker datePicker = new DatePicker();
+    datePicker.setValue(transaction.getTransactionDate().toLocalDate());
+
+    TextField descriptionField = new TextField(transaction.getDescription());
+    TextField paymentField = new TextField(String.valueOf(transaction.getPaymentAmount()));
+    TextField depositField = new TextField(String.valueOf(transaction.getDepositAmount()));
+
+    // Add fields to the grid
+    editPane.add(new Label("Account:"), 0, 0);
+    editPane.add(accountComboBox, 1, 0);
+    editPane.add(new Label("Type:"), 0, 1);
+    editPane.add(typeComboBox, 1, 1);
+    editPane.add(new Label("Date:"), 0, 2);
+    editPane.add(datePicker, 1, 2);
+    editPane.add(new Label("Description:"), 0, 3);
+    editPane.add(descriptionField, 1, 3);
+    editPane.add(new Label("Payment Amount:"), 0, 4);
+    editPane.add(paymentField, 1, 4);
+    editPane.add(new Label("Deposit Amount:"), 0, 5);
+    editPane.add(depositField, 1, 5);
+
+    Button saveButton = new Button("Save");
+    saveButton.setStyle("-fx-background-color: #cbdfd6;");
+    saveButton.setOnAction(e -> {
+        // Save the updated transaction
+        if (dbHelper.updateTransaction(
+                transaction.getId(),
+                accountComboBox.getValue(),
+                typeComboBox.getValue(),
+                Date.valueOf(datePicker.getValue()),
+                descriptionField.getText(),
+                Double.parseDouble(paymentField.getText()),
+                Double.parseDouble(depositField.getText()))) {
+            showAlert("Success", "Transaction updated successfully!");
+            primaryStage.setScene(createSearchTransactionsScene());
+        } else {
+            showAlert("Error", "Failed to update transaction.");
+        }
+    });
+
+    Button backButton = new Button("Back");
+    backButton.setStyle("-fx-background-color: #cbdfd6;");
+    backButton.setOnAction(e -> primaryStage.setScene(createSearchTransactionsScene()));
+
+    editLayout.getChildren().addAll(backButton, editLabel, editPane, saveButton);
+    
+    return new Scene(editLayout, 820, 640);
+} //Adnan added-modified-end
+
+
+
+
+    
+    /* 
     // Adnan added-modified-start
     private Scene createEnterTransactionsScene() {
         VBox enterTransactionLayout = new VBox(20);
@@ -439,8 +556,8 @@ public class Main extends Application {
         enterTransactionPane.setAlignment(Pos.CENTER);
 
         return new Scene(enterTransactionLayout, 820, 640);
-    }
-
+    } 
+    */
 
     private void saveTransaction() {
         String accountName = accountComboBox.getValue();
