@@ -73,6 +73,13 @@ public class Main extends Application {
         MenuItem CreateNewScheduledTransactionMenuItem = new MenuItem("Create New Scheduled Transaction");
         CreateNewScheduledTransactionMenuItem.setOnAction(e -> primaryStage.setScene(createEnterScheduledTransactionsScene()));
 
+        //Adnan added-modified-start
+        // Search Transactions menu item
+        MenuItem searchTransactionsMenuItem = new MenuItem("Search Transactions");
+        searchTransactionsMenuItem.setOnAction(e -> primaryStage.setScene(createSearchTransactionsScene()));
+        actionsMenu.getItems().add(searchTransactionsMenuItem);
+        //Adnan added-modified-end
+
         // Add MenuItems to the Menu
         pagesMenu.getItems().addAll(viewTransactionsMenuItem, viewScheduledTransactionsMenuItem);
         actionsMenu.getItems().addAll(AddTransactionTypeMenuItem, CreateNewTransactionMenuItem, CreateNewScheduledTransactionMenuItem);
