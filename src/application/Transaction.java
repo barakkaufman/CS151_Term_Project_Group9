@@ -24,7 +24,8 @@ public class Transaction {
     }
 
     // Getters
-    public int getId() { return id; }
+    public int getId() { return id; } 
+    public void setId(int id) { this.id = id; } //Adnan added-modified-start-&-end
     public String getAccountName() { return accountName; }
     public String getTransactionType() { return transactionType; }
     public Date getTransactionDate() { return transactionDate; }
