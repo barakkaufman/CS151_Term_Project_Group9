@@ -20,6 +20,7 @@ public class DatabaseHelper {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        populateInitialTransactions(); //Adnan added-modified-start-&-end
     }
 
     private void createTransactionTypeTable() {
