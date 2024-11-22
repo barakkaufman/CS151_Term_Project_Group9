@@ -328,7 +328,7 @@ public class DatabaseHelper {
         }
     }
 
-// Adnan added this portion of the code
+// Adnan added-modified-start
 public List<Transaction> searchTransactions(String searchTerm) {
     List<Transaction> transactions = new ArrayList<>();
     String sql = "SELECT account_name, transaction_type, transaction_date, description, " +
@@ -421,7 +421,7 @@ private int getTransactionCount() {
         e.printStackTrace();
     }
     return 0;
-} // Adnan's code ends here
+} // Adnan added-modified-end
 
 }
 
