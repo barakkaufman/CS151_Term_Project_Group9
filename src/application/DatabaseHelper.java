@@ -328,6 +328,100 @@ public class DatabaseHelper {
         }
     }
 
+// Adnan added this portion of the code
+public List<Transaction> searchTransactions(String searchTerm) {
+    List<Transaction> transactions = new ArrayList<>();
+    String sql = "SELECT account_name, transaction_type, transaction_date, description, " +
+                 "payment_amount, deposit_amount FROM transactions " +
+                 "WHERE description LIKE ? ORDER BY transaction_date DESC";
+
+    try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+        pstmt.setString(1, "%" + searchTerm + "%");
+        ResultSet rs = pstmt.executeQuery();
+
+        while (rs.next()) {
+            transactions.add(new Transaction(
+                rs.getString("account_name"),
+                rs.getString("transaction_type"),
+                rs.getDate("transaction_date"),
+                rs.getString("description"),
+                rs.getDouble("deposit_amount"),
+                rs.getDouble("payment_amount")
+            ));
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+    return transactions;
+}
+
+public boolean updateTransaction(int id, String accountName, String transactionType,
+                               Date transactionDate, String description,
+                               double paymentAmount, double depositAmount) {
+    String sql = "UPDATE transactions SET account_name = ?, transaction_type = ?, " +
+                 "transaction_date = ?, description = ?, payment_amount = ?, " +
+                 "deposit_amount = ? WHERE id = ?";
+
+    try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+        pstmt.setString(1, accountName);
+        pstmt.setString(2, transactionType);
+        pstmt.setDate(3, transactionDate);
+        pstmt.setString(4, description);
+        pstmt.setDouble(5, paymentAmount);
+        pstmt.setDouble(6, depositAmount);
+        pstmt.setInt(7, id);
+        return pstmt.executeUpdate() > 0;
+    } catch (SQLException e) {
+        e.printStackTrace();
+        return false;
+    }
+}
+
+// Add method to populate initial transactions
+public void populateInitialTransactions() {
+    if (getTransactionCount() == 0) {
+        String[] descriptions = {
+            "Monthly Rent Payment",
+            "Grocery Shopping at Walmart",
+            "Salary Deposit",
+            "Internet Bill Payment",
+            "Car Insurance Premium",
+            "Restaurant Dinner",
+            "Gas Station Fill-up",
+            "Movie Theater Tickets",
+            "Utility Bill Payment",
+            "Phone Bill Payment"
+        };
+
+        double[] amounts = {1200.00, 156.78, 3500.00, 79.99, 145.50,
+                          65.43, 45.67, 32.50, 125.00, 89.99};
+
+        for (int i = 0; i < 10; i++) {
+            boolean isPayment = i != 2; // Make the third transaction a deposit
+            saveTransaction(
+                "Main Account",
+                isPayment ? "Payment" : "Deposit",
+                new Date(System.currentTimeMillis() - (i * 86400000)),
+                descriptions[i],
+                isPayment ? amounts[i] : 0,
+                isPayment ? 0 : amounts[i]
+            );
+        }
+    }
+}
+
+private int getTransactionCount() {
+    String sql = "SELECT COUNT(*) FROM transactions";
+    try (Statement stmt = connection.createStatement();
+         ResultSet rs = stmt.executeQuery(sql)) {
+        if (rs.next()) {
+            return rs.getInt(1);
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+    return 0;
+}
 
 }
 
