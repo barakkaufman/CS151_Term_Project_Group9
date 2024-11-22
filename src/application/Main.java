@@ -603,7 +603,6 @@ private Scene createEditTransactionScene(Transaction transaction) {
             showAlert("Error", "Failed to save transaction.");
         }
     }
-    // Adnan added-modified-end
 
     private Scene createTransactionsScene() {
         VBox TransactionsLayout = new VBox(20);
