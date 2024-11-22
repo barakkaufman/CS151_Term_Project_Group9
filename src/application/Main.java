@@ -492,6 +492,119 @@ private Scene createEditTransactionScene(Transaction transaction) {
     return new Scene(editLayout, 820, 640);
 } //Adnan added-modified-end
 
+    
+// Adnan added-modified-start
+private Scene createSearchScheduledTransactionsScene() {
+    VBox searchLayout = new VBox(20);
+    searchLayout.setPadding(new Insets(20));
+    searchLayout.setStyle("-fx-background-color: white;");
+
+    Label searchLabel = new Label("Search Scheduled Transactions");
+    searchLabel.setStyle("-fx-font-size: 24px; -fx-text-fill: #1e4b35; -fx-font-weight: bold;");
+
+    TextField searchField = new TextField();
+    searchField.setPromptText("Enter schedule name to search");
+    
+    Button searchButton = new Button("Search");
+    searchButton.setStyle("-fx-background-color: #cbdfd6;");
+    
+    TableView<ScheduledTransaction> searchResultsTable = new TableView<>();
+    setupScheduledTransactionsTable();
+    
+    searchButton.setOnAction(e -> {
+        String searchTerm = searchField.getText().trim();
+        searchResultsTable.getItems().clear();
+        searchResultsTable.getItems().addAll(dbHelper.searchScheduledTransactions(searchTerm));
+    });
+    
+    searchResultsTable.setOnMouseClicked(event -> {
+        if (event.getClickCount() == 2) {
+            ScheduledTransaction selectedTransaction = 
+                searchResultsTable.getSelectionModel().getSelectedItem();
+            if (selectedTransaction != null) {
+                primaryStage.setScene(createEditScheduledTransactionScene(selectedTransaction));
+            }
+        }
+    });
+
+    Button backButton = new Button("Back");
+    backButton.setStyle("-fx-background-color: #cbdfd6;");
+    backButton.setOnAction(e -> primaryStage.setScene(createHomeScene()));
+
+    searchLayout.getChildren().addAll(backButton, searchLabel, searchField, 
+                                    searchButton, searchResultsTable);
+    
+    return new Scene(searchLayout, 820, 640);
+}
+
+private Scene createEditScheduledTransactionScene(ScheduledTransaction transaction) {
+    VBox editLayout = new VBox(20);
+    editLayout.setPadding(new Insets(20));
+    editLayout.setStyle("-fx-background-color: white;");
+
+    Label editLabel = new Label("Edit Scheduled Transaction");
+    editLabel.setStyle("-fx-font-size: 24px; -fx-text-fill: #1e4b35; -fx-font-weight: bold;");
+
+    GridPane editPane = new GridPane();
+    editPane.setHgap(10);
+    editPane.setVgap(10);
+
+    TextField scheduleNameField = new TextField(transaction.getScheduleName());
+    ComboBox<String> accountComboBox = new ComboBox<>();
+    accountComboBox.getItems().addAll(dbHelper.getAllAccountNames());
+    accountComboBox.setValue(transaction.getAccountName());
+
+    ComboBox<String> typeComboBox = new ComboBox<>();
+    typeComboBox.getItems().addAll(dbHelper.getAllTransactionTypes());
+    typeComboBox.setValue(transaction.getTransactionType());
+
+    ComboBox<String> frequencyComboBox = new ComboBox<>();
+    frequencyComboBox.getItems().addAll("Monthly", "Weekly", "Yearly");
+    frequencyComboBox.setValue(transaction.getFrequency());
+
+    TextField dueDateField = new TextField(String.valueOf(transaction.getDueDate()));
+    TextField paymentAmountField = new TextField(String.valueOf(transaction.getPaymentAmount()));
+
+    editPane.add(new Label("Schedule Name:"), 0, 0);
+    editPane.add(scheduleNameField, 1, 0);
+    editPane.add(new Label("Account:"), 0, 1);
+    editPane.add(accountComboBox, 1, 1);
+    editPane.add(new Label("Type:"), 0, 2);
+    editPane.add(typeComboBox, 1, 2);
+    editPane.add(new Label("Frequency:"), 0, 3);
+    editPane.add(frequencyComboBox, 1, 3);
+    editPane.add(new Label("Due Date:"), 0, 4);
+    editPane.add(dueDateField, 1, 4);
+    editPane.add(new Label("Payment Amount:"), 0, 5);
+    editPane.add(paymentAmountField, 1, 5);
+
+    Button saveButton = new Button("Save");
+    saveButton.setStyle("-fx-background-color: #cbdfd6;");
+    saveButton.setOnAction(e -> {
+        if (dbHelper.updateScheduledTransaction(
+                transaction.getScheduleName(),
+                scheduleNameField.getText(),
+                accountComboBox.getValue(),
+                typeComboBox.getValue(),
+                frequencyComboBox.getValue(),
+                dueDateField.getText(),
+                Double.parseDouble(paymentAmountField.getText()))) {
+            showAlert("Success", "Scheduled transaction updated successfully!");
+            primaryStage.setScene(createSearchScheduledTransactionsScene());
+        } else {
+            showAlert("Error", "Failed to update scheduled transaction.");
+        }
+    });
+
+    Button backButton = new Button("Back");
+    backButton.setStyle("-fx-background-color: #cbdfd6;");
+    backButton.setOnAction(e -> primaryStage.setScene(createSearchScheduledTransactionsScene()));
+
+    editLayout.getChildren().addAll(backButton, editLabel, editPane, saveButton);
+    
+    return new Scene(editLayout, 820, 640);
+}m// Adnan added-modified-end
+
 
     /* 
     // Adnan added-modified-start-(commenting out)
