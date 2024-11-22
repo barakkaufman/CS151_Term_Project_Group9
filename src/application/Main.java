@@ -25,7 +25,7 @@ public class Main extends Application {
     private TableView<ScheduledTransaction> scheduledTransactionsTable;
     private TableView<Transaction> transactionsTable;
 
-
+    
     // Adnan added-modified-start transaction fields
     private ComboBox<String> accountComboBox;
     private ComboBox<String> transactionTypeComboBox;
@@ -371,6 +371,7 @@ public class Main extends Application {
         return new Scene(enterTransactionTypeLayout, 820, 640);
     }
 
+    
 // Adnan added-modified-start
 private Scene createSearchTransactionsScene() {
     VBox searchLayout = new VBox(20);
@@ -485,11 +486,8 @@ private Scene createEditTransactionScene(Transaction transaction) {
 } //Adnan added-modified-end
 
 
-
-
-    
     /* 
-    // Adnan added-modified-start
+    // Adnan added-modified-start-(commenting out)
     private Scene createEnterTransactionsScene() {
         VBox enterTransactionLayout = new VBox(20);
         enterTransactionLayout.setPadding(new Insets(20));
@@ -556,9 +554,10 @@ private Scene createEditTransactionScene(Transaction transaction) {
         enterTransactionPane.setAlignment(Pos.CENTER);
 
         return new Scene(enterTransactionLayout, 820, 640);
-    } 
+    } // Adnan added-modified-end-(commenting out)
     */
 
+    
     private void saveTransaction() {
         String accountName = accountComboBox.getValue();
         String transactionType = transactionTypeComboBox.getValue();
