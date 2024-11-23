@@ -3,7 +3,7 @@ package application;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Scene;
+import javafx.scene.Scene; 
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.*;
@@ -387,7 +387,7 @@ public class Main extends Application {
     }
 
     
-// Adnan added-modified-start
+// Adnan added-modified-start-(rubric #5)
 private Scene createSearchTransactionsScene() {
     VBox searchLayout = new VBox(20);
     searchLayout.setPadding(new Insets(20));
@@ -501,7 +501,7 @@ private Scene createEditTransactionScene(Transaction transaction) {
 } //Adnan added-modified-end
 
     
-// Adnan added-modified-start
+// Adnan added-modified-start-(rubric #6)
 private Scene createSearchScheduledTransactionsScene() {
     VBox searchLayout = new VBox(20);
     searchLayout.setPadding(new Insets(20));
@@ -611,7 +611,7 @@ private Scene createEditScheduledTransactionScene(ScheduledTransaction transacti
     editLayout.getChildren().addAll(backButton, editLabel, editPane, saveButton);
     
     return new Scene(editLayout, 820, 640);
-}m// Adnan added-modified-end
+} // Adnan added-modified-end
 
 
     /* 
