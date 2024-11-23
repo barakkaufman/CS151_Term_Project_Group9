@@ -344,9 +344,7 @@ public class DatabaseHelper {
 // Adnan added-modified-start
 public List<Transaction> searchTransactions(String searchTerm) {
     List<Transaction> transactions = new ArrayList<>();
-    String sql = "SELECT account_name, transaction_type, transaction_date, description, " +
-                 "payment_amount, deposit_amount FROM transactions " +
-                 "WHERE description LIKE ? ORDER BY transaction_date DESC";
+    String sql = "SELECT account_name, transaction_type, transaction_date, description, payment_amount, deposit_amount FROM transactions WHERE description LIKE ? ORDER BY transaction_date DESC";
 
     try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
         pstmt.setString(1, "%" + searchTerm + "%");

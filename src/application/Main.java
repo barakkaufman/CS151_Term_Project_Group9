@@ -179,9 +179,32 @@ public class Main extends Application {
                 transactionTypeColumn, frequencyColumn, dueDateColumn, paymentAmountColumn);
     }
 
+    private void setupScheduledTransactionsSearchResultsTable(TableView<ScheduledTransaction> table) {
+        TableColumn<ScheduledTransaction, String> scheduleNameColumn = new TableColumn<>("Schedule Name");
+        scheduleNameColumn.setCellValueFactory(new PropertyValueFactory<>("scheduleName"));
+
+        TableColumn<ScheduledTransaction, String> accountNameColumn = new TableColumn<>("Account Name");
+        accountNameColumn.setCellValueFactory(new PropertyValueFactory<>("accountName"));
+
+        TableColumn<ScheduledTransaction, String> transactionTypeColumn = new TableColumn<>("Transaction Type");
+        transactionTypeColumn.setCellValueFactory(new PropertyValueFactory<>("transactionType"));
+
+        TableColumn<ScheduledTransaction, String> frequencyColumn = new TableColumn<>("Frequency");
+        frequencyColumn.setCellValueFactory(new PropertyValueFactory<>("frequency"));
+
+        TableColumn<ScheduledTransaction, Integer> dueDateColumn = new TableColumn<>("Due Date");
+        dueDateColumn.setCellValueFactory(new PropertyValueFactory<>("dueDate"));
+
+        TableColumn<ScheduledTransaction, Double> paymentAmountColumn = new TableColumn<>("Payment Amount");
+        paymentAmountColumn.setCellValueFactory(new PropertyValueFactory<>("paymentAmount"));
+
+        // Add columns to the TableView
+        table.getColumns().addAll(scheduleNameColumn, accountNameColumn,
+                transactionTypeColumn, frequencyColumn, dueDateColumn, paymentAmountColumn);
+    }
+
     private void setupTransactionsTable() {
         transactionsTable = new TableView<>();
-
         TableColumn<Transaction, String> accountNameColumn = new TableColumn<>("Account Name");
         accountNameColumn.setCellValueFactory(new PropertyValueFactory<>("accountName"));
 
@@ -204,6 +227,30 @@ public class Main extends Application {
         transactionsTable.getColumns().addAll(accountNameColumn,
                 transactionTypeColumn, transactionDateColumn, transactionDescriptionColumn, paymentAmountColumn, depositAmountColumn);
     }
+
+    private void setupTransactionsSearchResultsTable(TableView<Transaction> table) {
+        TableColumn<Transaction, String> accountNameColumn = new TableColumn<>("Account Name");
+        accountNameColumn.setCellValueFactory(new PropertyValueFactory<>("accountName"));
+
+        TableColumn<Transaction, String> transactionTypeColumn = new TableColumn<>("Transaction Type");
+        transactionTypeColumn.setCellValueFactory(new PropertyValueFactory<>("transactionType"));
+
+        TableColumn<Transaction, String> transactionDateColumn = new TableColumn<>("Transaction Date");
+        transactionDateColumn.setCellValueFactory(new PropertyValueFactory<>("transactionDate"));
+
+        TableColumn<Transaction, String> transactionDescriptionColumn = new TableColumn<>("Transaction Description");
+        transactionDescriptionColumn.setCellValueFactory(new PropertyValueFactory<>("description"));
+
+        TableColumn<Transaction, Double> paymentAmountColumn = new TableColumn<>("Payment Amount");
+        paymentAmountColumn.setCellValueFactory(new PropertyValueFactory<>("paymentAmount"));
+
+        TableColumn<Transaction, Double> depositAmountColumn = new TableColumn<>("Deposit Amount");
+        depositAmountColumn.setCellValueFactory(new PropertyValueFactory<>("depositAmount"));
+
+        table.getColumns().setAll(accountNameColumn, transactionTypeColumn, transactionDateColumn,
+                transactionDescriptionColumn, paymentAmountColumn, depositAmountColumn);
+    }
+
 
     private Scene createCreateAccountScene() {
         VBox enterAccountLayout = new VBox(20);
@@ -386,7 +433,8 @@ public class Main extends Application {
         return new Scene(enterTransactionTypeLayout, 820, 640);
     }
 
-    
+
+
 // Adnan added-modified-start-(rubric #5)
 private Scene createSearchTransactionsScene() {
     VBox searchLayout = new VBox(20);
@@ -400,16 +448,22 @@ private Scene createSearchTransactionsScene() {
     searchField.setPromptText("Enter description to search");
     
     Button searchButton = new Button("Search");
-    searchButton.setStyle("-fx-background-color: #cbdfd6;");
-    
+
     TableView<Transaction> searchResultsTable = new TableView<>();
-    setupTransactionsTable();
+    setupTransactionsSearchResultsTable(searchResultsTable);
+
+    // Define button styles
+    String buttonStyle = "-fx-background-color: #cbdfd6;";
+    String hoverStyle = "-fx-background-color: #749485; -fx-text-fill: white;";
     
     searchButton.setOnAction(e -> {
         String searchTerm = searchField.getText().trim();
         searchResultsTable.getItems().clear();
         searchResultsTable.getItems().addAll(dbHelper.searchTransactions(searchTerm));
     });
+    searchButton.setStyle(buttonStyle);
+    searchButton.setOnMouseEntered(e -> searchButton.setStyle(hoverStyle));
+    searchButton.setOnMouseExited(e -> searchButton.setStyle(buttonStyle));
     
     searchResultsTable.setOnMouseClicked(event -> {
         if (event.getClickCount() == 2) { // Double click
@@ -421,7 +475,9 @@ private Scene createSearchTransactionsScene() {
     });
 
     Button backButton = new Button("Back");
-    backButton.setStyle("-fx-background-color: #cbdfd6;");
+    backButton.setStyle(buttonStyle);
+    backButton.setOnMouseEntered(e -> backButton.setStyle(hoverStyle));
+    backButton.setOnMouseExited(e -> backButton.setStyle(buttonStyle));
     backButton.setOnAction(e -> primaryStage.setScene(createHomeScene()));
 
     searchLayout.getChildren().addAll(backButton, searchLabel, searchField, 
@@ -441,6 +497,10 @@ private Scene createEditTransactionScene(Transaction transaction) {
     GridPane editPane = new GridPane();
     editPane.setHgap(10);
     editPane.setVgap(10);
+
+    // Define button styles
+    String buttonStyle = "-fx-background-color: #cbdfd6;";
+    String hoverStyle = "-fx-background-color: #749485; -fx-text-fill: white;";
 
     // Create and populate fields
     ComboBox<String> accountComboBox = new ComboBox<>();
@@ -473,7 +533,9 @@ private Scene createEditTransactionScene(Transaction transaction) {
     editPane.add(depositField, 1, 5);
 
     Button saveButton = new Button("Save");
-    saveButton.setStyle("-fx-background-color: #cbdfd6;");
+    saveButton.setStyle(buttonStyle);
+    saveButton.setOnMouseEntered(e -> saveButton.setStyle(hoverStyle));
+    saveButton.setOnMouseExited(e -> saveButton.setStyle(buttonStyle));
     saveButton.setOnAction(e -> {
         // Save the updated transaction
         if (dbHelper.updateTransaction(
@@ -492,7 +554,9 @@ private Scene createEditTransactionScene(Transaction transaction) {
     });
 
     Button backButton = new Button("Back");
-    backButton.setStyle("-fx-background-color: #cbdfd6;");
+    backButton.setStyle(buttonStyle);
+    backButton.setOnMouseEntered(e -> backButton.setStyle(hoverStyle));
+    backButton.setOnMouseExited(e -> backButton.setStyle(buttonStyle));
     backButton.setOnAction(e -> primaryStage.setScene(createSearchTransactionsScene()));
 
     editLayout.getChildren().addAll(backButton, editLabel, editPane, saveButton);
@@ -512,19 +576,26 @@ private Scene createSearchScheduledTransactionsScene() {
 
     TextField searchField = new TextField();
     searchField.setPromptText("Enter schedule name to search");
+
+    // Define button styles
+    String buttonStyle = "-fx-background-color: #cbdfd6;";
+    String hoverStyle = "-fx-background-color: #749485; -fx-text-fill: white;";
     
     Button searchButton = new Button("Search");
     searchButton.setStyle("-fx-background-color: #cbdfd6;");
     
     TableView<ScheduledTransaction> searchResultsTable = new TableView<>();
-    setupScheduledTransactionsTable();
-    
+    setupScheduledTransactionsSearchResultsTable(searchResultsTable);
+
     searchButton.setOnAction(e -> {
         String searchTerm = searchField.getText().trim();
         searchResultsTable.getItems().clear();
         searchResultsTable.getItems().addAll(dbHelper.searchScheduledTransactions(searchTerm));
     });
-    
+    searchButton.setStyle(buttonStyle);
+    searchButton.setOnMouseEntered(e -> searchButton.setStyle(hoverStyle));
+    searchButton.setOnMouseExited(e -> searchButton.setStyle(buttonStyle));
+
     searchResultsTable.setOnMouseClicked(event -> {
         if (event.getClickCount() == 2) {
             ScheduledTransaction selectedTransaction = 
@@ -536,7 +607,9 @@ private Scene createSearchScheduledTransactionsScene() {
     });
 
     Button backButton = new Button("Back");
-    backButton.setStyle("-fx-background-color: #cbdfd6;");
+    backButton.setStyle(buttonStyle);
+    backButton.setOnMouseEntered(e -> backButton.setStyle(hoverStyle));
+    backButton.setOnMouseExited(e -> backButton.setStyle(buttonStyle));
     backButton.setOnAction(e -> primaryStage.setScene(createHomeScene()));
 
     searchLayout.getChildren().addAll(backButton, searchLabel, searchField, 
@@ -586,8 +659,14 @@ private Scene createEditScheduledTransactionScene(ScheduledTransaction transacti
     editPane.add(new Label("Payment Amount:"), 0, 5);
     editPane.add(paymentAmountField, 1, 5);
 
+    // Define button styles
+    String buttonStyle = "-fx-background-color: #cbdfd6;";
+    String hoverStyle = "-fx-background-color: #749485; -fx-text-fill: white;";
+
     Button saveButton = new Button("Save");
-    saveButton.setStyle("-fx-background-color: #cbdfd6;");
+    saveButton.setStyle(buttonStyle);
+    saveButton.setOnMouseEntered(e -> saveButton.setStyle(hoverStyle));
+    saveButton.setOnMouseExited(e -> saveButton.setStyle(buttonStyle));
     saveButton.setOnAction(e -> {
         if (dbHelper.updateScheduledTransaction(
                 transaction.getScheduleName(),
@@ -605,7 +684,9 @@ private Scene createEditScheduledTransactionScene(ScheduledTransaction transacti
     });
 
     Button backButton = new Button("Back");
-    backButton.setStyle("-fx-background-color: #cbdfd6;");
+    backButton.setStyle(buttonStyle);
+    backButton.setOnMouseEntered(e -> backButton.setStyle(hoverStyle));
+    backButton.setOnMouseExited(e -> backButton.setStyle(buttonStyle));
     backButton.setOnAction(e -> primaryStage.setScene(createSearchScheduledTransactionsScene()));
 
     editLayout.getChildren().addAll(backButton, editLabel, editPane, saveButton);
