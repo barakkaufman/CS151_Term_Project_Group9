@@ -537,9 +537,16 @@ private Scene createEditTransactionScene(Transaction transaction) {
     saveButton.setOnMouseEntered(e -> saveButton.setStyle(hoverStyle));
     saveButton.setOnMouseExited(e -> saveButton.setStyle(buttonStyle));
     saveButton.setOnAction(e -> {
+        // Original values used to find the transaction
+        String originalAccountName = transaction.getAccountName();
+        Date originalTransactionDate = transaction.getTransactionDate();
+        String originalDescription = transaction.getDescription();
+
         // Save the updated transaction
         if (dbHelper.updateTransaction(
-                transaction.getId(),
+                originalAccountName, // Use original account name for lookup
+                originalTransactionDate, // Use original transaction date for lookup
+                originalDescription, // Use original description for lookup
                 accountComboBox.getValue(),
                 typeComboBox.getValue(),
                 Date.valueOf(datePicker.getValue()),

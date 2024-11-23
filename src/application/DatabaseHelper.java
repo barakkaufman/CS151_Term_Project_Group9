@@ -366,18 +366,26 @@ public List<Transaction> searchTransactions(String searchTerm) {
     return transactions;
 }
 
-public boolean updateTransaction(int id, String accountName, String transactionType,
-                               Date transactionDate, String description,
+public boolean updateTransaction(String originalAccountName, Date originalTransactionDate, String originalDescription,
+                                 String newAccountName, String transactionType,
+                               Date newTransactionDate, String newDescription,
                                double paymentAmount, double depositAmount) {
+    Integer id = findTransactionId(originalAccountName, originalTransactionDate, originalDescription);
+
+    if (id == null) {
+        System.out.println("Transaction not found for the provided attributes.");
+        return false;
+    }
+
     String sql = "UPDATE transactions SET account_name = ?, transaction_type = ?, " +
                  "transaction_date = ?, description = ?, payment_amount = ?, " +
                  "deposit_amount = ? WHERE id = ?";
 
     try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-        pstmt.setString(1, accountName);
+        pstmt.setString(1, newAccountName);
         pstmt.setString(2, transactionType);
-        pstmt.setDate(3, transactionDate);
-        pstmt.setString(4, description);
+        pstmt.setDate(3, newTransactionDate);
+        pstmt.setString(4, newDescription);
         pstmt.setDouble(5, paymentAmount);
         pstmt.setDouble(6, depositAmount);
         pstmt.setInt(7, id);
@@ -387,6 +395,22 @@ public boolean updateTransaction(int id, String accountName, String transactionT
         return false;
     }
 }
+
+    private Integer findTransactionId(String accountName, Date transactionDate, String description) {
+        String sql = "SELECT id FROM transactions WHERE account_name = ? AND transaction_date = ? AND description = ?";
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setString(1, accountName);
+            pstmt.setDate(2, transactionDate);
+            pstmt.setString(3, description);
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt("id");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 
 /*
 // Add method to populate initial transactions
