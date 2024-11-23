@@ -75,14 +75,14 @@ public class Main extends Application {
 
         //Adnan added-modified-start
         // Search Transactions menu item
-        MenuItem searchTransactionsMenuItem = new MenuItem("Search Transactions");
+        MenuItem searchTransactionsMenuItem = new MenuItem("Search or Edit Transactions");
         searchTransactionsMenuItem.setOnAction(e -> primaryStage.setScene(createSearchTransactionsScene()));
         actionsMenu.getItems().add(searchTransactionsMenuItem);
         //Adnan added-modified-end
 
         //Adnan added-modified-start
         // Search Scheduled Transactions menu item
-        MenuItem searchScheduledTransactionsMenuItem = new MenuItem("Search Scheduled Transactions");
+        MenuItem searchScheduledTransactionsMenuItem = new MenuItem("Search or Edit Scheduled Transactions");
         searchScheduledTransactionsMenuItem.setOnAction(e -> 
         primaryStage.setScene(createSearchScheduledTransactionsScene()));
         actionsMenu.getItems().add(searchScheduledTransactionsMenuItem);
@@ -487,35 +487,45 @@ private Scene createSearchTransactionsScene() {
 }
 
 private Scene createEditTransactionScene(Transaction transaction) {
-    VBox editLayout = new VBox(20);
-    editLayout.setPadding(new Insets(20));
-    editLayout.setStyle("-fx-background-color: white;");
+    BorderPane rootLayout = new BorderPane();
+    rootLayout.setPadding(new Insets(20));
+    rootLayout.setStyle("-fx-background-color: white;");
 
+    // Title label
     Label editLabel = new Label("Edit Transaction");
     editLabel.setStyle("-fx-font-size: 24px; -fx-text-fill: #1e4b35; -fx-font-weight: bold;");
+    BorderPane.setAlignment(editLabel, Pos.CENTER);
 
+    // Form layout
     GridPane editPane = new GridPane();
     editPane.setHgap(10);
     editPane.setVgap(10);
+    editPane.setPadding(new Insets(50, 0, 0, 0));
+    editPane.setAlignment(Pos.TOP_CENTER);
 
     // Define button styles
     String buttonStyle = "-fx-background-color: #cbdfd6;";
     String hoverStyle = "-fx-background-color: #749485; -fx-text-fill: white;";
 
+
     // Create and populate fields
     ComboBox<String> accountComboBox = new ComboBox<>();
     accountComboBox.getItems().addAll(dbHelper.getAllAccountNames());
     accountComboBox.setValue(transaction.getAccountName());
+    accountComboBox.setStyle("-fx-background-color: #cbdfd6; -fx-text-fill: black;");
 
     ComboBox<String> typeComboBox = new ComboBox<>();
     typeComboBox.getItems().addAll(dbHelper.getAllTransactionTypes());
     typeComboBox.setValue(transaction.getTransactionType());
+    typeComboBox.setStyle("-fx-background-color: #cbdfd6; -fx-text-fill: black;");
 
     DatePicker datePicker = new DatePicker();
     datePicker.setValue(transaction.getTransactionDate().toLocalDate());
 
     TextField descriptionField = new TextField(transaction.getDescription());
+
     TextField paymentField = new TextField(String.valueOf(transaction.getPaymentAmount()));
+
     TextField depositField = new TextField(String.valueOf(transaction.getDepositAmount()));
 
     // Add fields to the grid
@@ -566,13 +576,23 @@ private Scene createEditTransactionScene(Transaction transaction) {
     backButton.setOnMouseExited(e -> backButton.setStyle(buttonStyle));
     backButton.setOnAction(e -> primaryStage.setScene(createSearchTransactionsScene()));
 
-    editLayout.getChildren().addAll(backButton, editLabel, editPane, saveButton);
-    
-    return new Scene(editLayout, 820, 640);
+    // Create a VBox to center the back button vertically
+    VBox backButtonBox = new VBox(backButton);
+    backButtonBox.setAlignment(Pos.TOP_LEFT);
+    backButtonBox.setPadding(new Insets(0, 20, 0, 0)); // Padding on the right
+    rootLayout.setLeft(backButtonBox);
+
+    // Add components to the root layout
+    rootLayout.setTop(editLabel);
+    rootLayout.setCenter(editPane);
+    rootLayout.setBottom(saveButton);
+    BorderPane.setAlignment(saveButton, Pos.CENTER);
+
+    return new Scene(rootLayout, 820, 640);
 } //Adnan added-modified-end
 
-    
-// Adnan added-modified-start-(rubric #6)
+
+    // Adnan added-modified-start-(rubric #6)
 private Scene createSearchScheduledTransactionsScene() {
     VBox searchLayout = new VBox(20);
     searchLayout.setPadding(new Insets(20));
@@ -626,29 +646,41 @@ private Scene createSearchScheduledTransactionsScene() {
 }
 
 private Scene createEditScheduledTransactionScene(ScheduledTransaction transaction) {
-    VBox editLayout = new VBox(20);
-    editLayout.setPadding(new Insets(20));
-    editLayout.setStyle("-fx-background-color: white;");
+    BorderPane rootLayout = new BorderPane();
+    rootLayout.setPadding(new Insets(20));
+    rootLayout.setStyle("-fx-background-color: white;");
 
+    // Title label
     Label editLabel = new Label("Edit Scheduled Transaction");
     editLabel.setStyle("-fx-font-size: 24px; -fx-text-fill: #1e4b35; -fx-font-weight: bold;");
+    BorderPane.setAlignment(editLabel, Pos.CENTER);
 
+    // Form layout
     GridPane editPane = new GridPane();
     editPane.setHgap(10);
     editPane.setVgap(10);
+    editPane.setPadding(new Insets(50, 0, 0, 0));
+    editPane.setAlignment(Pos.TOP_CENTER);
+
+    // Define button styles
+    String buttonStyle = "-fx-background-color: #cbdfd6;";
+    String hoverStyle = "-fx-background-color: #749485; -fx-text-fill: white;";
 
     TextField scheduleNameField = new TextField(transaction.getScheduleName());
     ComboBox<String> accountComboBox = new ComboBox<>();
     accountComboBox.getItems().addAll(dbHelper.getAllAccountNames());
     accountComboBox.setValue(transaction.getAccountName());
+    accountComboBox.setStyle("-fx-background-color: #cbdfd6; -fx-text-fill: black;");
 
     ComboBox<String> typeComboBox = new ComboBox<>();
     typeComboBox.getItems().addAll(dbHelper.getAllTransactionTypes());
     typeComboBox.setValue(transaction.getTransactionType());
+    typeComboBox.setStyle("-fx-background-color: #cbdfd6; -fx-text-fill: black;");
 
     ComboBox<String> frequencyComboBox = new ComboBox<>();
     frequencyComboBox.getItems().addAll("Monthly", "Weekly", "Yearly");
     frequencyComboBox.setValue(transaction.getFrequency());
+    frequencyComboBox.setStyle("-fx-background-color: #cbdfd6; -fx-text-fill: black;");
 
     TextField dueDateField = new TextField(String.valueOf(transaction.getDueDate()));
     TextField paymentAmountField = new TextField(String.valueOf(transaction.getPaymentAmount()));
@@ -666,9 +698,6 @@ private Scene createEditScheduledTransactionScene(ScheduledTransaction transacti
     editPane.add(new Label("Payment Amount:"), 0, 5);
     editPane.add(paymentAmountField, 1, 5);
 
-    // Define button styles
-    String buttonStyle = "-fx-background-color: #cbdfd6;";
-    String hoverStyle = "-fx-background-color: #749485; -fx-text-fill: white;";
 
     Button saveButton = new Button("Save");
     saveButton.setStyle(buttonStyle);
@@ -696,9 +725,19 @@ private Scene createEditScheduledTransactionScene(ScheduledTransaction transacti
     backButton.setOnMouseExited(e -> backButton.setStyle(buttonStyle));
     backButton.setOnAction(e -> primaryStage.setScene(createSearchScheduledTransactionsScene()));
 
-    editLayout.getChildren().addAll(backButton, editLabel, editPane, saveButton);
+    // Create a VBox to center the back button vertically
+    VBox backButtonBox = new VBox(backButton);
+    backButtonBox.setAlignment(Pos.TOP_LEFT);
+    backButtonBox.setPadding(new Insets(0, 20, 0, 0)); // Padding on the right
+    rootLayout.setLeft(backButtonBox);
+
+    // Add components to the root layout
+    rootLayout.setTop(editLabel);
+    rootLayout.setCenter(editPane);
+    rootLayout.setBottom(saveButton);
+    BorderPane.setAlignment(saveButton, Pos.CENTER);
     
-    return new Scene(editLayout, 820, 640);
+    return new Scene(rootLayout, 820, 640);
 } // Adnan added-modified-end
 
 

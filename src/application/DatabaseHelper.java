@@ -412,55 +412,6 @@ public boolean updateTransaction(String originalAccountName, Date originalTransa
         return null;
     }
 
-/*
-// Add method to populate initial transactions
-public void populateInitialTransactions() {
-    if (getTransactionCount() == 0) {
-        String[] descriptions = {
-            "Student Loan Payment",
-            "Car Payment",
-            "Credit Card Payment",
-            "Mortgage Payment",
-            "Amazon Subscription Payment",
-            "Medical Bill Payment",
-            "PG&E Payment",
-            "Phone Bill Payment",
-            "Transfer to ETrade Account",
-            "Donate to RedCross"
-        };
-
-        double[] amounts = {1200.00, 156.78, 3500.00, 79.99, 145.50,
-                          65.43, 45.67, 32.50, 125.00, 89.99};
-
-        for (int i = 0; i < 10; i++) {
-            boolean isPayment = i != 2; // Make the third transaction a deposit
-            saveTransaction(
-                "Main Account",
-                isPayment ? "Payment" : "Deposit",
-                new Date(System.currentTimeMillis() - (i * 86400000)),
-                descriptions[i],
-                isPayment ? amounts[i] : 0,
-                isPayment ? 0 : amounts[i]
-            );
-        }
-    }
-}
- */
-
-private int getTransactionCount() {
-    String sql = "SELECT COUNT(*) FROM transactions";
-    try (Statement stmt = connection.createStatement();
-         ResultSet rs = stmt.executeQuery(sql)) {
-        if (rs.next()) {
-            return rs.getInt(1);
-        }
-    } catch (SQLException e) {
-        e.printStackTrace();
-    }
-    return 0;
-} // Adnan added-modified-end
-
-
 // Adnan added-modified-start
 public List<ScheduledTransaction> searchScheduledTransactions(String searchTerm) {
     List<ScheduledTransaction> transactions = new ArrayList<>();

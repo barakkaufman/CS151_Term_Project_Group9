@@ -14,7 +14,6 @@ public class Transaction {
     // Constructor
     public Transaction(String accountName, String transactionType,
                                 Date transactionDate, String description, double paymentAmount, double depositAmount) {
-//        this.id = id;
         this.accountName = accountName;
         this.transactionType = transactionType;
         this.transactionDate = transactionDate;
