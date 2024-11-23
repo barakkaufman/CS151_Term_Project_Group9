@@ -126,8 +126,8 @@ public class DatabaseHelper {
                         res.getString("transaction_type"),
                         res.getDate("transaction_date"),
                         res.getString("description"),
-                        res.getDouble("deposit_amount"),
-                        res.getDouble("payment_amount")
+                        res.getDouble("payment_amount"),
+                        res.getDouble("deposit_amount")
                 ));
             }
 
@@ -356,8 +356,8 @@ public List<Transaction> searchTransactions(String searchTerm) {
                 rs.getString("transaction_type"),
                 rs.getDate("transaction_date"),
                 rs.getString("description"),
-                rs.getDouble("deposit_amount"),
-                rs.getDouble("payment_amount")
+                rs.getDouble("payment_amount"),
+                rs.getDouble("deposit_amount")
             ));
         }
     } catch (SQLException e) {

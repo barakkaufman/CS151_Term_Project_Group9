@@ -449,6 +449,9 @@ private Scene createSearchTransactionsScene() {
     
     Button searchButton = new Button("Search");
 
+    Label instructionLabel = new Label("Single-click any transaction to edit it.");
+    instructionLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #555555;");
+
     TableView<Transaction> searchResultsTable = new TableView<>();
     setupTransactionsSearchResultsTable(searchResultsTable);
 
@@ -466,7 +469,7 @@ private Scene createSearchTransactionsScene() {
     searchButton.setOnMouseExited(e -> searchButton.setStyle(buttonStyle));
     
     searchResultsTable.setOnMouseClicked(event -> {
-        if (event.getClickCount() == 2) { // Double click
+        if (event.getClickCount() == 1) { // Single click
             Transaction selectedTransaction = searchResultsTable.getSelectionModel().getSelectedItem();
             if (selectedTransaction != null) {
                 primaryStage.setScene(createEditTransactionScene(selectedTransaction));
@@ -480,8 +483,8 @@ private Scene createSearchTransactionsScene() {
     backButton.setOnMouseExited(e -> backButton.setStyle(buttonStyle));
     backButton.setOnAction(e -> primaryStage.setScene(createHomeScene()));
 
-    searchLayout.getChildren().addAll(backButton, searchLabel, searchField, 
-                                    searchButton, searchResultsTable);
+    searchLayout.getChildren().addAll(backButton, searchLabel, searchField,
+                                    searchButton, instructionLabel, searchResultsTable);
     
     return new Scene(searchLayout, 820, 640);
 }
@@ -601,6 +604,9 @@ private Scene createSearchScheduledTransactionsScene() {
     Label searchLabel = new Label("Search Scheduled Transactions");
     searchLabel.setStyle("-fx-font-size: 24px; -fx-text-fill: #1e4b35; -fx-font-weight: bold;");
 
+    Label instructionLabel = new Label("Single-click any scheduled transaction to edit it.");
+    instructionLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #555555;");
+
     TextField searchField = new TextField();
     searchField.setPromptText("Enter schedule name to search");
 
@@ -624,7 +630,7 @@ private Scene createSearchScheduledTransactionsScene() {
     searchButton.setOnMouseExited(e -> searchButton.setStyle(buttonStyle));
 
     searchResultsTable.setOnMouseClicked(event -> {
-        if (event.getClickCount() == 2) {
+        if (event.getClickCount() == 1) {
             ScheduledTransaction selectedTransaction = 
                 searchResultsTable.getSelectionModel().getSelectedItem();
             if (selectedTransaction != null) {
@@ -640,7 +646,7 @@ private Scene createSearchScheduledTransactionsScene() {
     backButton.setOnAction(e -> primaryStage.setScene(createHomeScene()));
 
     searchLayout.getChildren().addAll(backButton, searchLabel, searchField, 
-                                    searchButton, searchResultsTable);
+                                    searchButton, instructionLabel, searchResultsTable);
     
     return new Scene(searchLayout, 820, 640);
 }
