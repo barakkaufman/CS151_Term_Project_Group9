@@ -403,7 +403,7 @@ private Scene createSearchTransactionsScene() {
     searchButton.setStyle("-fx-background-color: #cbdfd6;");
     
     TableView<Transaction> searchResultsTable = new TableView<>();
-    setupTransactionsTable(searchResultsTable);
+    setupTransactionsTable();
     
     searchButton.setOnAction(e -> {
         String searchTerm = searchField.getText().trim();
@@ -614,7 +614,6 @@ private Scene createEditScheduledTransactionScene(ScheduledTransaction transacti
 } // Adnan added-modified-end
 
 
-    /* 
     // Adnan added-modified-start-(commenting out)
     private Scene createEnterTransactionsScene() {
         VBox enterTransactionLayout = new VBox(20);
@@ -683,7 +682,6 @@ private Scene createEditScheduledTransactionScene(ScheduledTransaction transacti
 
         return new Scene(enterTransactionLayout, 820, 640);
     } // Adnan added-modified-end-(commenting out)
-    */
 
     
     private void saveTransaction() {
@@ -762,8 +760,14 @@ private Scene createEditScheduledTransactionScene(ScheduledTransaction transacti
         setupTransactionsTable();
         refreshTransactionsTable();
 
+        Button deleteTransactionButton = new Button("Delete Selected Transaction");
+        deleteTransactionButton.setStyle(buttonStyle);
+        deleteTransactionButton.setOnMouseEntered(e -> deleteTransactionButton.setStyle(hoverStyle));
+        deleteTransactionButton.setOnMouseExited(e -> deleteTransactionButton.setStyle(buttonStyle));
+        deleteTransactionButton.setOnAction(e -> deleteSelectedTransaction());
+
         // Add components to the layout, including enterTransactionPane
-        TransactionsLayout.getChildren().addAll(enterTransactionPane, homePageLabel, transactionsTable);
+        TransactionsLayout.getChildren().addAll(enterTransactionPane, homePageLabel, transactionsTable, deleteTransactionButton);
 
         return new Scene(TransactionsLayout, 820, 640);
     }
@@ -967,6 +971,22 @@ private Scene createEditScheduledTransactionScene(ScheduledTransaction transacti
         if (isDeleted) {
             showAlert("Success", "Transaction deleted successfully.");
             refreshScheduledTransactionsTable(); // Refresh the table to show updated data
+        } else {
+            showAlert("Error", "Failed to delete transaction.");
+        }
+    }
+
+    private void deleteSelectedTransaction() {
+        Transaction selectedTransaction = transactionsTable.getSelectionModel().getSelectedItem();
+        if (selectedTransaction == null) {
+            showAlert("Error", "No transaction selected.");
+            return;
+        }
+
+        boolean isDeleted = dbHelper.deleteTransaction(selectedTransaction.getDescription());
+        if (isDeleted) {
+            showAlert("Success", "Transaction deleted successfully.");
+            refreshTransactionsTable(); // Refresh the table to show updated data
         } else {
             showAlert("Error", "Failed to delete transaction.");
         }

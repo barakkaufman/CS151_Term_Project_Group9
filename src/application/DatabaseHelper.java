@@ -20,7 +20,7 @@ public class DatabaseHelper {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        populateInitialTransactions(); //Adnan added-modified-start-&-end
+//        populateInitialTransactions(); //Adnan added-modified-start-&-end
     }
 
     private void createTransactionTypeTable() {
@@ -329,6 +329,18 @@ public class DatabaseHelper {
         }
     }
 
+    public boolean deleteTransaction(String description) {
+        String sql = "DELETE FROM transactions WHERE description = ?";
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setString(1, description);
+            int affectedRows = pstmt.executeUpdate();
+            return affectedRows > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
 // Adnan added-modified-start
 public List<Transaction> searchTransactions(String searchTerm) {
     List<Transaction> transactions = new ArrayList<>();
@@ -378,6 +390,7 @@ public boolean updateTransaction(int id, String accountName, String transactionT
     }
 }
 
+/*
 // Add method to populate initial transactions
 public void populateInitialTransactions() {
     if (getTransactionCount() == 0) {
@@ -410,6 +423,7 @@ public void populateInitialTransactions() {
         }
     }
 }
+ */
 
 private int getTransactionCount() {
     String sql = "SELECT COUNT(*) FROM transactions";
