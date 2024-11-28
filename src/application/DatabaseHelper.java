@@ -1,6 +1,7 @@
 package application;
 
 import java.sql.*;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -460,6 +461,34 @@ public boolean updateScheduledTransaction(String originalName, String scheduleNa
         return false;
     }
 }// Adnan added-modified-end
+
+    public List<ScheduledTransaction> getScheduledTransactionsDueToday() {
+        List<ScheduledTransaction> transactions = new ArrayList<>();
+        LocalDate today = LocalDate.now();
+        int todayDate = today.getDayOfMonth();
+
+        String sql = "SELECT schedule_name, account_name, transaction_type, frequency, due_date, payment_amount " +
+                "FROM scheduled_transactions WHERE due_date = ?";
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setInt(1, todayDate);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    transactions.add(new ScheduledTransaction(
+                            rs.getString("schedule_name"),
+                            rs.getString("account_name"),
+                            rs.getString("transaction_type"),
+                            rs.getString("frequency"),
+                            rs.getInt("due_date"),
+                            rs.getDouble("payment_amount")
+                    ));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return transactions;
+    }
+
 
 }
 

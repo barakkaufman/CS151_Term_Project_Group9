@@ -36,7 +36,7 @@ public class Main extends Application {
     private TextField scheduledNameField;
     private ComboBox<String> frequencyComboBox;
     private TextField dueDateField;
-    // Adnan added-modified-end
+    private TableView<ScheduledTransaction> dueTodayTransactionsTable;
 
     @Override
     public void start(Stage primaryStage) {
@@ -96,12 +96,20 @@ public class Main extends Application {
         menuBar.getMenus().add(actionsMenu);
         menuBar.getMenus().add(pagesMenu);
 
+        setupDueTodayTransactionsTable();
+        refreshDueTodayTransactionsTable();
+
         Label homePageLabel = new Label("Home Page");
         homePageLabel.setStyle("-fx-font-size: 24px; -fx-text-fill: #1e4b35 ; -fx-font-weight: bold;");
 
+        Label dueTodayLabel = new Label("Scheduled Transactions Due Today:");
+        dueTodayLabel.setStyle("-fx-font-size: 12px; -fx-text-fill: #1e4b35 ;");
+
+        Label yourAccountsLabel = new Label("Your Accounts:");
+        dueTodayLabel.setStyle("-fx-font-size: 12px; -fx-text-fill: #1e4b35 ;");
+
         accountTable = new TableView<>(); // Initialize the TableView
         setupAccountTable();
-
         refreshAccountTable(); // Populate the table with account details
 
         // Define button styles
@@ -130,7 +138,7 @@ public class Main extends Application {
         spacer.setMinHeight(20);
 
 
-        homeLayout.getChildren().addAll(menuBar, homePageLabel, new Label("Your Accounts"),
+        homeLayout.getChildren().addAll(menuBar, homePageLabel, dueTodayLabel, dueTodayTransactionsTable, yourAccountsLabel,
                 accountTable, spacer, buttonLayout);
 
         homeLayout.setAlignment(Pos.TOP_CENTER);
@@ -746,8 +754,6 @@ private Scene createEditScheduledTransactionScene(ScheduledTransaction transacti
     return new Scene(rootLayout, 820, 640);
 } // Adnan added-modified-end
 
-
-    // Adnan added-modified-start-(commenting out)
     private Scene createEnterTransactionsScene() {
         VBox enterTransactionLayout = new VBox(20);
         enterTransactionLayout.setPadding(new Insets(20));
@@ -1033,8 +1039,6 @@ private Scene createEditScheduledTransactionScene(ScheduledTransaction transacti
         }
     }
 
-
-
     private Scene createScheduledTransactionsScene() {
         VBox scheduledTransactionsLayout = new VBox(20);
         scheduledTransactionsLayout.setPadding(new Insets(20));
@@ -1125,7 +1129,33 @@ private Scene createEditScheduledTransactionScene(ScheduledTransaction transacti
         }
     }
 
+    private void setupDueTodayTransactionsTable() {
+        dueTodayTransactionsTable = new TableView<>();
 
+        TableColumn<ScheduledTransaction, String> scheduleNameColumn = new TableColumn<>("Schedule Name");
+        scheduleNameColumn.setCellValueFactory(new PropertyValueFactory<>("scheduleName"));
+
+        TableColumn<ScheduledTransaction, String> accountNameColumn = new TableColumn<>("Account Name");
+        accountNameColumn.setCellValueFactory(new PropertyValueFactory<>("accountName"));
+
+        TableColumn<ScheduledTransaction, String> transactionTypeColumn = new TableColumn<>("Transaction Type");
+        transactionTypeColumn.setCellValueFactory(new PropertyValueFactory<>("transactionType"));
+
+        TableColumn<ScheduledTransaction, Integer> dueDateColumn = new TableColumn<>("Due Date");
+        dueDateColumn.setCellValueFactory(new PropertyValueFactory<>("dueDate"));
+
+        TableColumn<ScheduledTransaction, Double> paymentAmountColumn = new TableColumn<>("Payment Amount");
+        paymentAmountColumn.setCellValueFactory(new PropertyValueFactory<>("paymentAmount"));
+
+        dueTodayTransactionsTable.getColumns().addAll(scheduleNameColumn, accountNameColumn, transactionTypeColumn, dueDateColumn, paymentAmountColumn);
+
+        dueTodayTransactionsTable.setPlaceholder(new Label("No Scheduled Transactions Due Today!"));
+    }
+
+    private void refreshDueTodayTransactionsTable() {
+        dueTodayTransactionsTable.getItems().clear();
+        dueTodayTransactionsTable.getItems().addAll(dbHelper.getScheduledTransactionsDueToday());
+    }
 
     public static void main(String[] args) {
         launch(args);
