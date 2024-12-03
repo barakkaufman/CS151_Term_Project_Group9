@@ -25,7 +25,6 @@ public class Main extends Application {
     private TableView<ScheduledTransaction> scheduledTransactionsTable;
     private TableView<Transaction> transactionsTable;
 
-    
     // Adnan added-modified-start transaction fields
     private ComboBox<String> accountComboBox;
     private ComboBox<String> transactionTypeComboBox;
@@ -47,6 +46,164 @@ public class Main extends Application {
         primaryStage.show();
     }
 
+
+// Adnan added-modified-start (12-03-2024)
+private Scene createTransactionTypeReportScene() {
+    VBox reportLayout = new VBox(20);
+    reportLayout.setPadding(new Insets(20));
+    reportLayout.setStyle("-fx-background-color: white;");
+
+    Label reportLabel = new Label("Transaction Type Report");
+    reportLabel.setStyle("-fx-font-size: 24px; -fx-text-fill: #1e4b35; -fx-font-weight: bold;");
+
+    ComboBox<String> typeComboBox = new ComboBox<>();
+    typeComboBox.getItems().addAll(dbHelper.getAllTransactionTypes());
+    typeComboBox.setPromptText("Select Transaction Type");
+    typeComboBox.setStyle("-fx-background-color: #cbdfd6;");
+
+    TableView<Transaction> reportTable = new TableView<>();
+    setupTransactionsReportTable(reportTable, false);
+
+    typeComboBox.setOnAction(e -> {
+        String selectedType = typeComboBox.getValue();
+        if (selectedType != null) {
+            reportTable.getItems().clear();
+            reportTable.getItems().addAll(dbHelper.getTransactionsByType(selectedType));
+        }
+    });
+
+    reportTable.setOnMouseClicked(event -> {
+        if (event.getClickCount() == 1) {
+            Transaction selectedTransaction = reportTable.getSelectionModel().getSelectedItem();
+            if (selectedTransaction != null) {
+                primaryStage.setScene(createTransactionDetailsScene(selectedTransaction, 
+                    () -> primaryStage.setScene(createTransactionTypeReportScene())));
+            }
+        }
+    });
+
+    Button backButton = createStyledButton("Back", () -> primaryStage.setScene(createHomeScene()));
+    
+    reportLayout.getChildren().addAll(backButton, reportLabel, typeComboBox, reportTable);
+    return new Scene(reportLayout, 820, 640);
+}
+
+private Scene createAccountReportScene() {
+    VBox reportLayout = new VBox(20);
+    reportLayout.setPadding(new Insets(20));
+    reportLayout.setStyle("-fx-background-color: white;");
+
+    Label reportLabel = new Label("Account Transaction Report");
+    reportLabel.setStyle("-fx-font-size: 24px; -fx-text-fill: #1e4b35; -fx-font-weight: bold;");
+
+    ComboBox<String> accountComboBox = new ComboBox<>();
+    accountComboBox.getItems().addAll(dbHelper.getAllAccountNames());
+    accountComboBox.setPromptText("Select Account");
+    accountComboBox.setStyle("-fx-background-color: #cbdfd6;");
+
+    TableView<Transaction> reportTable = new TableView<>();
+    setupTransactionsReportTable(reportTable, true);
+
+    accountComboBox.setOnAction(e -> {
+        String selectedAccount = accountComboBox.getValue();
+        if (selectedAccount != null) {
+            reportTable.getItems().clear();
+            reportTable.getItems().addAll(dbHelper.getTransactionsByAccount(selectedAccount));
+        }
+    });
+
+    reportTable.setOnMouseClicked(event -> {
+        if (event.getClickCount() == 1) {
+            Transaction selectedTransaction = reportTable.getSelectionModel().getSelectedItem();
+            if (selectedTransaction != null) {
+                primaryStage.setScene(createTransactionDetailsScene(selectedTransaction, 
+                    () -> primaryStage.setScene(createAccountReportScene())));
+            }
+        }
+    });
+
+    Button backButton = createStyledButton("Back", () -> primaryStage.setScene(createHomeScene()));
+    
+    reportLayout.getChildren().addAll(backButton, reportLabel, accountComboBox, reportTable);
+    return new Scene(reportLayout, 820, 640);
+}
+
+private Scene createTransactionDetailsScene(Transaction transaction, Runnable onBack) {
+    VBox detailsLayout = new VBox(20);
+    detailsLayout.setPadding(new Insets(20));
+    detailsLayout.setStyle("-fx-background-color: white;");
+
+    Label detailsLabel = new Label("Transaction Details");
+    detailsLabel.setStyle("-fx-font-size: 24px; -fx-text-fill: #1e4b35; -fx-font-weight: bold;");
+
+    GridPane detailsGrid = new GridPane();
+    detailsGrid.setHgap(10);
+    detailsGrid.setVgap(10);
+    detailsGrid.setPadding(new Insets(20));
+
+    // Add read-only fields
+    addReadOnlyField(detailsGrid, "Account Name:", transaction.getAccountName(), 0);
+    addReadOnlyField(detailsGrid, "Transaction Type:", transaction.getTransactionType(), 1);
+    addReadOnlyField(detailsGrid, "Date:", transaction.getTransactionDate().toString(), 2);
+    addReadOnlyField(detailsGrid, "Description:", transaction.getDescription(), 3);
+    addReadOnlyField(detailsGrid, "Payment Amount:", String.valueOf(transaction.getPaymentAmount()), 4);
+    addReadOnlyField(detailsGrid, "Deposit Amount:", String.valueOf(transaction.getDepositAmount()), 5);
+
+    Button backButton = createStyledButton("Back", onBack);
+    
+    detailsLayout.getChildren().addAll(backButton, detailsLabel, detailsGrid);
+    return new Scene(detailsLayout, 820, 640);
+}
+
+private void addReadOnlyField(GridPane grid, String label, String value, int row) {
+    Label fieldLabel = new Label(label);
+    TextField fieldValue = new TextField(value);
+    fieldValue.setEditable(false);
+    fieldValue.setStyle("-fx-background-color: #f0f0f0;");
+    grid.add(fieldLabel, 0, row);
+    grid.add(fieldValue, 1, row);
+}
+
+private Button createStyledButton(String text, Runnable action) {
+    Button button = new Button(text);
+    String buttonStyle = "-fx-background-color: #cbdfd6;";
+    String hoverStyle = "-fx-background-color: #749485; -fx-text-fill: white;";
+    button.setStyle(buttonStyle);
+    button.setOnMouseEntered(e -> button.setStyle(hoverStyle));
+    button.setOnMouseExited(e -> button.setStyle(buttonStyle));
+    button.setOnAction(e -> action.run());
+    return button;
+}
+
+private void setupTransactionsReportTable(TableView<Transaction> table, boolean hideAccountName) {
+    if (!hideAccountName) {
+        TableColumn<Transaction, String> accountNameColumn = new TableColumn<>("Account Name");
+        accountNameColumn.setCellValueFactory(new PropertyValueFactory<>("accountName"));
+        table.getColumns().add(accountNameColumn);
+    }
+
+    TableColumn<Transaction, String> transactionTypeColumn = new TableColumn<>("Transaction Type");
+    transactionTypeColumn.setCellValueFactory(new PropertyValueFactory<>("transactionType"));
+    
+    TableColumn<Transaction, Date> dateColumn = new TableColumn<>("Date");
+    dateColumn.setCellValueFactory(new PropertyValueFactory<>("transactionDate"));
+    
+    TableColumn<Transaction, String> descriptionColumn = new TableColumn<>("Description");
+    descriptionColumn.setCellValueFactory(new PropertyValueFactory<>("description"));
+    
+    TableColumn<Transaction, Double> paymentColumn = new TableColumn<>("Payment Amount");
+    paymentColumn.setCellValueFactory(new PropertyValueFactory<>("paymentAmount"));
+    
+    TableColumn<Transaction, Double> depositColumn = new TableColumn<>("Deposit Amount");
+    depositColumn.setCellValueFactory(new PropertyValueFactory<>("depositAmount"));
+
+    table.getColumns().addAll(
+        transactionTypeColumn, dateColumn, descriptionColumn, 
+        paymentColumn, depositColumn
+    );
+} // Adnan added-modified-end (12-03-2024)
+
+    
     private Scene createHomeScene() {
         VBox homeLayout = new VBox(10);
         homeLayout.setPadding(new Insets(20));
