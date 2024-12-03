@@ -490,5 +490,57 @@ public boolean updateScheduledTransaction(String originalName, String scheduleNa
     }
 
 
+// Adnan added-modified-start (12-03-2024)
+public List<Transaction> getTransactionsByType(String transactionType) {
+    List<Transaction> transactions = new ArrayList<>();
+    String sql = "SELECT account_name, transaction_type, transaction_date, description, " +
+                 "payment_amount, deposit_amount FROM transactions " +
+                 "WHERE transaction_type = ? ORDER BY transaction_date DESC";
+    
+    try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+        pstmt.setString(1, transactionType);
+        ResultSet rs = pstmt.executeQuery();
+        
+        while (rs.next()) {
+            transactions.add(new Transaction(
+                rs.getString("account_name"),
+                rs.getString("transaction_type"),
+                rs.getDate("transaction_date"),
+                rs.getString("description"),
+                rs.getDouble("payment_amount"),
+                rs.getDouble("deposit_amount")
+            ));
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+    return transactions;
 }
 
+public List<Transaction> getTransactionsByAccount(String accountName) {
+    List<Transaction> transactions = new ArrayList<>();
+    String sql = "SELECT account_name, transaction_type, transaction_date, description, " +
+                 "payment_amount, deposit_amount FROM transactions " +
+                 "WHERE account_name = ? ORDER BY transaction_date DESC";
+    
+    try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+        pstmt.setString(1, accountName);
+        ResultSet rs = pstmt.executeQuery();
+        
+        while (rs.next()) {
+            transactions.add(new Transaction(
+                rs.getString("account_name"),
+                rs.getString("transaction_type"),
+                rs.getDate("transaction_date"),
+                rs.getString("description"),
+                rs.getDouble("payment_amount"),
+                rs.getDouble("deposit_amount")
+            ));
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+    return transactions;
+} // Adnan added-modified-end (12-03-2024)
+
+}
