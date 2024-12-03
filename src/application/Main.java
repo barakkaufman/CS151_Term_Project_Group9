@@ -244,6 +244,20 @@ private void setupTransactionsReportTable(TableView<Transaction> table, boolean 
         primaryStage.setScene(createSearchScheduledTransactionsScene()));
         actionsMenu.getItems().add(searchScheduledTransactionsMenuItem);
         //Adnan added-modified-end
+
+        
+        //Adnan added-modified-start (12-03-2024)
+        MenuItem viewTransactionTypeReportMenuItem = new MenuItem("Transaction Type Report");
+        viewTransactionTypeReportMenuItem.setOnAction(e -> primaryStage.setScene(createTransactionTypeReportScene()));
+        MenuItem viewAccountReportMenuItem = new MenuItem("Account Transaction Report");
+        viewAccountReportMenuItem.setOnAction(e -> primaryStage.setScene(createAccountReportScene()));
+        //Adnan added-modified-end (12-03-2024)
+
+        
+        //Adnan added-modified-start (12-03-2024)
+        pagesMenu.getItems().addAll(viewTransactionTypeReportMenuItem, viewAccountReportMenuItem);
+        //Adnan added-modified-end (12-03-2024)
+
         
         // Add MenuItems to the Menu
         pagesMenu.getItems().addAll(viewTransactionsMenuItem, viewScheduledTransactionsMenuItem);
