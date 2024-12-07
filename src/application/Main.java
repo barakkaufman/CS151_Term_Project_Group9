@@ -62,7 +62,7 @@ private Scene createTransactionTypeReportScene() {
     typeComboBox.setStyle("-fx-background-color: #cbdfd6;");
 
     TableView<Transaction> reportTable = new TableView<>();
-    setupTransactionsReportTable(reportTable, false);
+    setupTransactionsReportTable(reportTable, false, true);
 
     typeComboBox.setOnAction(e -> {
         String selectedType = typeComboBox.getValue();
@@ -102,7 +102,7 @@ private Scene createAccountReportScene() {
     accountComboBox.setStyle("-fx-background-color: #cbdfd6;");
 
     TableView<Transaction> reportTable = new TableView<>();
-    setupTransactionsReportTable(reportTable, true);
+    setupTransactionsReportTable(reportTable, true, false);
 
     accountComboBox.setOnAction(e -> {
         String selectedAccount = accountComboBox.getValue();
@@ -175,15 +175,18 @@ private Button createStyledButton(String text, Runnable action) {
     return button;
 }
 
-private void setupTransactionsReportTable(TableView<Transaction> table, boolean hideAccountName) {
+private void setupTransactionsReportTable(TableView<Transaction> table, boolean hideAccountName, boolean hideTransactionType) {
     if (!hideAccountName) {
         TableColumn<Transaction, String> accountNameColumn = new TableColumn<>("Account Name");
         accountNameColumn.setCellValueFactory(new PropertyValueFactory<>("accountName"));
         table.getColumns().add(accountNameColumn);
     }
 
-    TableColumn<Transaction, String> transactionTypeColumn = new TableColumn<>("Transaction Type");
-    transactionTypeColumn.setCellValueFactory(new PropertyValueFactory<>("transactionType"));
+    if (!hideTransactionType) {
+        TableColumn<Transaction, String> transactionTypeColumn = new TableColumn<>("Transaction Type");
+        transactionTypeColumn.setCellValueFactory(new PropertyValueFactory<>("transactionType"));
+        table.getColumns().add(transactionTypeColumn);
+    }
     
     TableColumn<Transaction, Date> dateColumn = new TableColumn<>("Date");
     dateColumn.setCellValueFactory(new PropertyValueFactory<>("transactionDate"));
@@ -198,7 +201,7 @@ private void setupTransactionsReportTable(TableView<Transaction> table, boolean 
     depositColumn.setCellValueFactory(new PropertyValueFactory<>("depositAmount"));
 
     table.getColumns().addAll(
-        transactionTypeColumn, dateColumn, descriptionColumn, 
+        dateColumn, descriptionColumn,
         paymentColumn, depositColumn
     );
 } // Adnan added-modified-end (12-03-2024)
