@@ -66,6 +66,11 @@ private Scene createTransactionTypeReportScene(String selectedType, ObservableLi
     TableView<Transaction> reportTable = new TableView<>();
     setupTransactionsReportTable(reportTable, false, true);
 
+    // Placeholder message for when no transaction type is selected
+    Label placeholderLabel = new Label("Select a transaction type above to view filtered transactions here!");
+    placeholderLabel.setStyle("-fx-text-fill: gray; -fx-font-size: 16px; -fx-font-style: italic;");
+    reportTable.setPlaceholder(placeholderLabel);
+
     // Populate table with provided transactions or fetch all if null
     if (transactions != null) {
         reportTable.getItems().addAll(transactions);
@@ -116,6 +121,11 @@ private Scene createAccountReportScene(String selectedAccountType, ObservableLis
     TableView<Transaction> reportTable = new TableView<>();
     setupTransactionsReportTable(reportTable, true, false);
 
+    // Placeholder message for when no account is selected
+    Label placeholderLabel = new Label("Select an account above to view filtered transactions here!");
+    placeholderLabel.setStyle("-fx-text-fill: gray; -fx-font-size: 16px; -fx-font-style: italic;");
+    reportTable.setPlaceholder(placeholderLabel);
+
     // Populate the table with provided transactions or fetch all if null
     if (transactions != null) {
         reportTable.getItems().addAll(transactions);
@@ -150,34 +160,44 @@ private Scene createAccountReportScene(String selectedAccountType, ObservableLis
     return new Scene(reportLayout, 820, 640);
 }
 
-private Scene createTransactionDetailsScene(Transaction transaction, Runnable onBack) {
-    VBox detailsLayout = new VBox(20);
-    detailsLayout.setPadding(new Insets(20));
-    detailsLayout.setStyle("-fx-background-color: white;");
+    private Scene createTransactionDetailsScene(Transaction transaction, Runnable onBack) {
+        VBox detailsLayout = new VBox(20);
+        detailsLayout.setPadding(new Insets(20));
+        detailsLayout.setStyle("-fx-background-color: white;");
 
-    Label detailsLabel = new Label("Transaction Details");
-    detailsLabel.setStyle("-fx-font-size: 24px; -fx-text-fill: #1e4b35; -fx-font-weight: bold;");
+        // Top section with Back button on the left and centered label
+        BorderPane topSection = new BorderPane();
+        Button backButton = createStyledButton("Back", onBack);
+        topSection.setLeft(backButton);
 
-    GridPane detailsGrid = new GridPane();
-    detailsGrid.setHgap(10);
-    detailsGrid.setVgap(10);
-    detailsGrid.setPadding(new Insets(20));
+        Label detailsLabel = new Label("Transaction Details");
+        detailsLabel.setStyle("-fx-font-size: 24px; -fx-text-fill: #1e4b35; -fx-font-weight: bold;");
+        BorderPane.setAlignment(detailsLabel, Pos.CENTER); // Center the label within the top section
+        topSection.setCenter(detailsLabel);
 
-    // Add read-only fields
-    addReadOnlyField(detailsGrid, "Account Name:", transaction.getAccountName(), 0);
-    addReadOnlyField(detailsGrid, "Transaction Type:", transaction.getTransactionType(), 1);
-    addReadOnlyField(detailsGrid, "Date:", transaction.getTransactionDate().toString(), 2);
-    addReadOnlyField(detailsGrid, "Description:", transaction.getDescription(), 3);
-    addReadOnlyField(detailsGrid, "Payment Amount:", String.valueOf(transaction.getPaymentAmount()), 4);
-    addReadOnlyField(detailsGrid, "Deposit Amount:", String.valueOf(transaction.getDepositAmount()), 5);
+        // Grid for transaction details
+        GridPane detailsGrid = new GridPane();
+        detailsGrid.setHgap(10);
+        detailsGrid.setVgap(10);
+        detailsGrid.setPadding(new Insets(20));
+        detailsGrid.setAlignment(Pos.CENTER);
 
-    Button backButton = createStyledButton("Back", onBack);
-    
-    detailsLayout.getChildren().addAll(backButton, detailsLabel, detailsGrid);
-    return new Scene(detailsLayout, 820, 640);
-}
+        // Add read-only fields
+        addReadOnlyField(detailsGrid, "Account Name:", transaction.getAccountName(), 0);
+        addReadOnlyField(detailsGrid, "Transaction Type:", transaction.getTransactionType(), 1);
+        addReadOnlyField(detailsGrid, "Date:", transaction.getTransactionDate().toString(), 2);
+        addReadOnlyField(detailsGrid, "Description:", transaction.getDescription(), 3);
+        addReadOnlyField(detailsGrid, "Payment Amount:", String.valueOf(transaction.getPaymentAmount()), 4);
+        addReadOnlyField(detailsGrid, "Deposit Amount:", String.valueOf(transaction.getDepositAmount()), 5);
 
-private void addReadOnlyField(GridPane grid, String label, String value, int row) {
+        // Add everything to the main layout
+        detailsLayout.getChildren().addAll(topSection, detailsGrid);
+
+        return new Scene(detailsLayout, 820, 640);
+    }
+
+
+    private void addReadOnlyField(GridPane grid, String label, String value, int row) {
     Label fieldLabel = new Label(label);
     TextField fieldValue = new TextField(value);
     fieldValue.setEditable(false);
@@ -1345,7 +1365,10 @@ private Scene createEditScheduledTransactionScene(ScheduledTransaction transacti
 
         dueTodayTransactionsTable.getColumns().addAll(scheduleNameColumn, accountNameColumn, transactionTypeColumn, dueDateColumn, paymentAmountColumn);
 
-        dueTodayTransactionsTable.setPlaceholder(new Label("No Scheduled Transactions Due Today!"));
+        // Placeholder message for when no transaction type is selected
+        Label placeholderLabel = new Label("No Scheduled Transactions Due Today!");
+        placeholderLabel.setStyle("-fx-text-fill: gray; -fx-font-size: 16px; -fx-font-style: italic;");
+        dueTodayTransactionsTable.setPlaceholder(placeholderLabel);
     }
 
     private void refreshDueTodayTransactionsTable() {
