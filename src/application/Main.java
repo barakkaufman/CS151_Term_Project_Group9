@@ -1,6 +1,8 @@
 package application;
 
 import javafx.application.Application;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene; 
@@ -48,12 +50,12 @@ public class Main extends Application {
 
 
 // Adnan added-modified-start (12-03-2024)
-private Scene createTransactionTypeReportScene() {
+private Scene createTransactionTypeReportScene(String selectedType, ObservableList<Transaction> transactions) {
     VBox reportLayout = new VBox(20);
     reportLayout.setPadding(new Insets(20));
     reportLayout.setStyle("-fx-background-color: white;");
 
-    Label reportLabel = new Label("Transaction Type Report");
+    Label reportLabel = new Label("View Transactions Based on Transaction Type");
     reportLabel.setStyle("-fx-font-size: 24px; -fx-text-fill: #1e4b35; -fx-font-weight: bold;");
 
     ComboBox<String> typeComboBox = new ComboBox<>();
@@ -64,11 +66,21 @@ private Scene createTransactionTypeReportScene() {
     TableView<Transaction> reportTable = new TableView<>();
     setupTransactionsReportTable(reportTable, false, true);
 
+    // Populate table with provided transactions or fetch all if null
+    if (transactions != null) {
+        reportTable.getItems().addAll(transactions);
+    }
+
+    if (selectedType != null) {
+        typeComboBox.setValue(selectedType);
+        reportTable.setItems(transactions);
+    }
+
     typeComboBox.setOnAction(e -> {
-        String selectedType = typeComboBox.getValue();
-        if (selectedType != null) {
-            reportTable.getItems().clear();
-            reportTable.getItems().addAll(dbHelper.getTransactionsByType(selectedType));
+        String newSelectedType = typeComboBox.getValue();
+        if (newSelectedType != null) {
+            ObservableList<Transaction> filteredTransactions = FXCollections.observableArrayList(dbHelper.getTransactionsByType(newSelectedType));
+            reportTable.setItems(filteredTransactions);
         }
     });
 
@@ -77,7 +89,7 @@ private Scene createTransactionTypeReportScene() {
             Transaction selectedTransaction = reportTable.getSelectionModel().getSelectedItem();
             if (selectedTransaction != null) {
                 primaryStage.setScene(createTransactionDetailsScene(selectedTransaction, 
-                    () -> primaryStage.setScene(createTransactionTypeReportScene())));
+                    () -> primaryStage.setScene(createTransactionTypeReportScene(typeComboBox.getValue(), reportTable.getItems()))));
             }
         }
     });
@@ -88,12 +100,12 @@ private Scene createTransactionTypeReportScene() {
     return new Scene(reportLayout, 820, 640);
 }
 
-private Scene createAccountReportScene() {
+private Scene createAccountReportScene(String selectedAccountType, ObservableList<Transaction> transactions) {
     VBox reportLayout = new VBox(20);
     reportLayout.setPadding(new Insets(20));
     reportLayout.setStyle("-fx-background-color: white;");
 
-    Label reportLabel = new Label("Account Transaction Report");
+    Label reportLabel = new Label("View Transactions Based on Account");
     reportLabel.setStyle("-fx-font-size: 24px; -fx-text-fill: #1e4b35; -fx-font-weight: bold;");
 
     ComboBox<String> accountComboBox = new ComboBox<>();
@@ -103,6 +115,16 @@ private Scene createAccountReportScene() {
 
     TableView<Transaction> reportTable = new TableView<>();
     setupTransactionsReportTable(reportTable, true, false);
+
+    // Populate the table with provided transactions or fetch all if null
+    if (transactions != null) {
+        reportTable.getItems().addAll(transactions);
+    }
+
+    if (selectedAccountType != null) {
+        accountComboBox.setValue(selectedAccountType);
+        reportTable.setItems(transactions);
+    }
 
     accountComboBox.setOnAction(e -> {
         String selectedAccount = accountComboBox.getValue();
@@ -117,7 +139,7 @@ private Scene createAccountReportScene() {
             Transaction selectedTransaction = reportTable.getSelectionModel().getSelectedItem();
             if (selectedTransaction != null) {
                 primaryStage.setScene(createTransactionDetailsScene(selectedTransaction, 
-                    () -> primaryStage.setScene(createAccountReportScene())));
+                    () -> primaryStage.setScene(createAccountReportScene(accountComboBox.getValue(), reportTable.getItems()))));
             }
         }
     });
@@ -250,10 +272,10 @@ private void setupTransactionsReportTable(TableView<Transaction> table, boolean 
 
         
         //Adnan added-modified-start (12-03-2024)
-        MenuItem viewTransactionTypeReportMenuItem = new MenuItem("Transaction Type Report");
-        viewTransactionTypeReportMenuItem.setOnAction(e -> primaryStage.setScene(createTransactionTypeReportScene()));
-        MenuItem viewAccountReportMenuItem = new MenuItem("Account Transaction Report");
-        viewAccountReportMenuItem.setOnAction(e -> primaryStage.setScene(createAccountReportScene()));
+        MenuItem viewTransactionTypeReportMenuItem = new MenuItem("View Transactions by Transaction Type");
+        viewTransactionTypeReportMenuItem.setOnAction(e -> primaryStage.setScene(createTransactionTypeReportScene(null, FXCollections.observableArrayList())));
+        MenuItem viewAccountReportMenuItem = new MenuItem("View Transactions by Account");
+        viewAccountReportMenuItem.setOnAction(e -> primaryStage.setScene(createAccountReportScene(null, FXCollections.observableArrayList())));
         //Adnan added-modified-end (12-03-2024)
 
         
